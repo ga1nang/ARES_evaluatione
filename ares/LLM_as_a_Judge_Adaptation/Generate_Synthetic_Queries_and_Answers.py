@@ -488,6 +488,7 @@ def save_synthetic_queries(documents: pd.DataFrame, filename: str) -> None:
     documents.to_csv(filename, index=False, sep="\t")
     print("Saved synthetic queries to: " + filename)
 
+#ga1nang change
 def generate_synthetic_queries(documents: pd.DataFrame, settings: dict) -> pd.DataFrame:
     """
     Generate synthetic queries using the FLAN approach.
@@ -499,52 +500,64 @@ def generate_synthetic_queries(documents: pd.DataFrame, settings: dict) -> pd.Da
     Returns:
         pd.DataFrame: DataFrame containing the documents with the generated synthetic queries.
     """
+    # Print start message in a box
     message = "Starting Synthetic Query Generation"
     box_width = len(message) + 4
-
     print("\n" + "=" * box_width)
     print(f"| {message} |")
     print("=" * box_width + "\n")
 
+    # Set configuration values
     total_documents = len(documents)
-    initial_queries_per_document = 2
-    chunk_size = total_documents
-    
+    initial_queries_per_document = 2 # Intended queries per document (not directly used here)
+    chunk_size = total_documents # Used when generating queries in batches
     num_documents = len(documents)
     half_num_documents = num_documents // 2
     
+    # If odd number of documents, increment first half
     if num_documents % 2 != 0:
         half_num_documents += 1
     
+    # Split documents into two halves (not used later but possibly for ablation or debugging)
     first_half_documents = documents.head(half_num_documents)
     second_half_documents = documents.tail(num_documents - half_num_documents)
     
+     # Step 1: Generate initial set of positive synthetic queries
     print(f"Generating positive queries for all {len(documents)} documents...")
     positive_queries_df = generate_positive_synthetic_queries(documents, settings, chunk_size)
-    
     num_to_sample = len(documents)
     
-    # Ensure we have enough unique queries
+    # Step 2: Check if we have enough unique queries (at least 2 per document)
     while len(positive_queries_df) < num_to_sample * 2:
         print("Warning: Not enough unique positive queries. Generating more...")
         additional_queries = generate_positive_synthetic_queries(documents, settings, chunk_size)
         positive_queries_df = pd.concat([positive_queries_df, additional_queries]).drop_duplicates(subset=['document', 'synthetic_query'])
     
-    # Sample two non-overlapping sets of positive queries, ensuring unique document-query pairs
+    # Step 3: Sample 1 positive query per document (Set 1)
     positive_queries_set1 = positive_queries_df.groupby('document').apply(lambda x: x.sample(n=1, random_state=42)).reset_index(drop=True)
+    
+    # Step 4: Sample another 1 positive query per document (Set 2), ensuring non-overlap with Set 1
     remaining_queries = positive_queries_df[~positive_queries_df.apply(tuple, 1).isin(positive_queries_set1.apply(tuple, 1))]
     positive_queries_set2 = remaining_queries.groupby('document').apply(lambda x: x.sample(n=1, random_state=43)).reset_index(drop=True)
     
+    # Mark context relevance label as "Yes" for both sets
     positive_queries_set1['Context_Relevance_Label'] = 'Yes'
     positive_queries_set2['Context_Relevance_Label'] = 'Yes'
     
+    # Step 5: Generate negative queries (queries not relevant to the given document)
     print(f"Generating negative queries...")
     negative_queries_df = generate_negative_synthetic_queries(positive_queries_df, documents, settings)
+    
+    # Sample 1 negative query per document
     negative_queries_df = negative_queries_df.groupby('document').apply(lambda x: x.sample(n=1, random_state=44)).reset_index(drop=True)
     
+    # Step 6: Combine all queries (positive and negative)
     combined_queries_df = pd.concat([positive_queries_set1, positive_queries_set2, negative_queries_df], ignore_index=True)
+    
+    # Save the combined result to disk
     save_synthetic_queries(combined_queries_df, settings['synthetic_queries_filename'])
 
+    # Print end message
     message = "Synthetic query generation completed."
     box_width = len(message) + 4
 
@@ -552,6 +565,7 @@ def generate_synthetic_queries(documents: pd.DataFrame, settings: dict) -> pd.Da
     print(f"| {message} |")
     print("=" * box_width + "\n")
 
+    # Final summary
     print(f"Total queries saved: {len(combined_queries_df)} (Positive Set 1: {len(positive_queries_set1)}, Positive Set 2: {len(positive_queries_set2)}, Negative: {len(negative_queries_df)})")
 
     return combined_queries_df
@@ -756,7 +770,8 @@ def shuffle_and_save(synthetic_queries: pd.DataFrame, synthetic_queries_filename
     print("Completed synthetic generation!")
     print(f"Saved synthetic queries file to: {synthetic_queries_filename}")
 
-def Generate_Synthetic_Answers(synthetic_queries_filename: str, answer_generation_settings: dict) -> None:
+#ga1nang change
+def generate_synthetic_answers(synthetic_queries_filename: str, answer_generation_settings: dict) -> None:
     """
     Main function to generate and save synthetic answers.
 
