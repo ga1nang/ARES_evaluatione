@@ -1,25 +1,11 @@
-import ast
-import copy
-import csv
-import json
-import math
 import random
-import re
-import requests
 import time
 
-import numpy as np
 import pandas as pd
 import torch
-from datasets import Dataset
-from sklearn.model_selection import train_test_split
 from tqdm import tqdm
-from typing import Union
-from vllm import LLM
 
-import openai
-from transformers import (AutoConfig, AutoModelForCausalLM, AutoModelForSeq2SeqLM,
-                          AutoTokenizer, BitsAndBytesConfig)
+from transformers import (AutoModelForCausalLM, AutoTokenizer)
 
 from ares.LLM_as_a_Judge_Adaptation.LLM_Synthetic_Generation import generate_synthetic_contradictory_answers_api_approach
 

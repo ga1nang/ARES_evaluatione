@@ -1,6 +1,5 @@
-from vllm import SamplingParams
+
 from transformers import AutoTokenizer
-from openai import OpenAI
 import time
 
 def generate_synthetic_query_vllm_approach(
