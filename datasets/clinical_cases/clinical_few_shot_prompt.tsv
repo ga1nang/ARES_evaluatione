@@ -1,0 +1,445 @@
+	Example	Query	Document	Answer	Context_Relevance_Label	Answer_Relevance_Label	Answer_Faithfulness_Label
+0	Example 1	"Could you please evaluate the following patient case and provide a comprehensive diagnostic reasoning pathway using both System 1 (intuitive pattern-recognition) and System 2 (analytical hypothesis testing)?
+
+Patient Case
+• Demographics A 20-year-old Sudanese housewife, refugee in northern Uganda
+
+• Chief complaints 2 days of fever to 39.6 °C, severe weakness, chest and abdominal pain, nausea, vomiting, diarrhoea, mild non-productive cough
+
+• Examination Semiconscious, T 39.6 °C, BP 90/60 mmHg, HR 90 bpm, RR 24/min. RUQ abdominal tenderness, hepatosplenomegaly, gum bleeding. Lungs clear, no rash, no lymphadenopathy.
+
+• Context Seen during an Ebola outbreak in the region; camp living conditions poor; denies known contact with ill persons.
+
+• Initial management Isolation instituted; routine labs deferred for biosafety.
+
+Please analyse whether her presentation fulfils the criteria for a viral haemorrhagic fever syndrome, specify which one, and outline the immediate infection-control and therapeutic steps.
+
+Let’s think step by step."	"*Clinical Cases in Tropical Medicine, 2nd Ed. – Chapter 1 “A 20-Year-Old Woman from Sudan With Fever, Haemorrhage and Shock”*
+
+The chapter narrates a refugee patient presenting with 2 days of high fever, abdominal pain, vomiting, diarrhoea and mucosal bleeding. Vital signs showed hypotension (90/60 mmHg) and fever 39.6 °C. During an ongoing Ebola virus disease (EVD) outbreak, she was placed in an isolation ward. Lab testing was suspended initially for biosafety; later, point-of-care ELISA antigen and PCR from a specialized field lab confirmed Ebola virus infection while IgG remained negative, indicating acute disease. Despite intravenous fluids, broad-spectrum antibiotics, and analgesics, her condition worsened rapidly: subconjunctival haemorrhage, profuse oral/nasal/rectal bleeding, dyspnoea, pulse 150 bpm, respiratory rate 36/min, hypothermic shock (36 °C), coma, and death within 24 h of admission. The text emphasises that haemorrhage is absent in some HF cases, that differential diagnoses include complicated malaria, typhoid, leptospirosis, and bacterial gastroenteritis, and that strict viral HF precautions plus contact tracing are mandatory. It also summarises filoviral pathophysiology (capillary leak, DIC) and cites WHO IPC guidance. :contentReference[oaicite:0]{index=0}"	"**System 1 (Intuitive snapshot)**
+
+The instant gestalt—young refugee, sudden high fever, mucosal bleeding, outbreak context—triggers the mental template of viral haemorrhagic fever, specifically Ebola.
+
+**System 2 (Structured analysis)**
+
+1. **Information Gathering**
+    
+    • Presenting features: acute febrile illness with GI and mucosal bleeding, hypotension, hepatosplenomegaly.
+    
+    • Epidemiology: residence in EVD outbreak zone; camp crowding; possible bat or human exposure although not reported.
+    
+    • Resource constraints: routine labs unavailable; reliance on POC viral assays.
+    
+    • Red flags: shock, multiorgan involvement, rapid deterioration.
+    
+2. **Hypothesis Generation**
+    
+    Differential diagnoses ranked by pre-test probability:
+    
+    – **Ebola virus disease** (highest, due to outbreak and bleeding)
+    
+    – Marburg virus disease (similar phenotype but outbreak absent)
+    
+    – Severe falciparum malaria (can cause shock and bleeding but malaria smear/RDT feasible)
+    
+    – Typhoid toxic shock, leptospirosis, rickettsiosis, severe dysentery (bleeding possible but typically intestinal or GU).
+    
+    Pathophysiology script for EVD: Filoviral infection → dendritic/macrophage replication → cytokine storm → capillary leak, impaired coagulation (DIC) → bleeding and shock :contentReference[oaicite:1]{index=1}:contentReference[oaicite:2]{index=2}.
+    
+3. **Hypothesis Testing**
+    
+    • Discriminatory features: gum + conjunctival + GI bleeding with profound shock in 48 h strongly favours filovirus.
+    
+    • Labs/Imaging: POC malaria smear; if negative, move Ebola Ag ELISA / RT-PCR to top priority. Other labs (AST > ALT, thrombocytopenia) typical but deferred for safety.
+    
+    • Bias check: availability bias (outbreak) could overshadow malaria—hence obtain smear quickly while observing universal precautions.
+    
+4. **Reflection & Final Diagnosis**
+    
+    Clinical picture, temporal clustering in outbreak, and confirmatory ELISA/PCR establish **Ebola virus disease**. No competing diagnosis explains fulminant haemorrhage plus epidemiologic link as completely.
+    
+    **Most Likely Diagnosis** Ebola virus disease (acute filoviral haemorrhagic fever).
+    
+    **Immediate Management & Public-Health Action**
+    
+    • Full viral HF barrier precautions (impermeable PPE, negative-pressure isolation if available).
+    
+    • Aggressive supportive care: crystalloid boluses, electrolyte correction, analgesia, antiemetics, careful fluid balance.
+    
+    • Empiric antimalarial and broad-spectrum antibiotics until malaria/other bacteria excluded.
+    
+    • Rapid notification of outbreak-response team; initiate contact tracing and 21-day fever surveillance on all unprotected contacts.
+    
+    • Consider investigational monoclonal antibody therapy if accessible; enrol in EVD treatment protocol per WHO guidelines.
+    
+    • Psychosocial support for family; safe burial practices if patient succumbs."	[[Yes]]	[[Yes]]	[[Yes]]
+1	Example 2	"Could you please evaluate the following patient case and provide a comprehensive diagnostic reasoning pathway using both System 1 (intuitive pattern-recognition) and System 2 (analytical hypothesis testing)?
+
+Patient Case
+
+• Demographics 7-year-old girl, resident of Lima, Peru, otherwise healthy
+
+• Chief complaint Painless, mildly pruritic ulcerative skin lesion on the bridge of the nose, present for 4 months; began as a small papule that slowly enlarged and ulcerated
+
+• Travel / exposure history Six months ago spent three weeks in a rural valley on the western slopes of the Andes (intermediate altitude, subtropical climate, farming community, known sand-fly activity). No trauma, no thorn injuries, no animal scratches, no contact with tuberculosis patients reported.
+
+• Past medical history Unremarkable; BCG at birth, up-to-date childhood vaccines; no immunosuppression, no chronic medications.
+
+• Examination Afebrile, vitals normal. Single 2 cm diameter ulcer on nasal dorsum with indurated raised border and plaque-like infiltration of surrounding skin; base shows granulation tissue, no purulence, no surrounding cellulitis. No lymphadenopathy, no hepatosplenomegaly; remainder of systemic exam normal.
+
+• Initial clinic action Lesion gently cleaned; scab removed revealing “cobblestone” ulcer floor. No labs or biopsies yet performed.
+
+Please analyse the full differential, identify the most likely etiology, describe definitive diagnostic steps, and outline an evidence-based treatment and follow-up plan appropriate for a paediatric patient in Peru.
+
+Let’s think step by step."	"Clinical Cases in Tropical Medicine, 2nd Edition – Chapter 2 “A 7-Year-Old Girl from Peru With a Chronic Skin Ulcer”  
+The chapter describes a 7-year-old Peruvian girl with a 4-month painless ulcer on her nose that started as a papule after travel to an Andean valley. Physical exam showed a 2 cm indurated ulcer with plaque-like infiltration; no lymph nodes, no fever. Differential diagnoses listed include cutaneous leishmaniasis, sporotrichosis, cutaneous tuberculosis, and Balamuthia infection. The text notes that cutaneous leishmaniasis is common in Andean valleys and typically produces painless ulcers with raised borders. Work-up recommendations: scrape under ulcer edge for Giemsa smear (70 % sensitivity), culture or PCR for Leishmania species, leishmanin skin test, and additional tests for sporotrichosis or mycobacteria if leishmaniasis is excluded. In the case, smear was negative, leishmanin skin test positive, PCR confirmed Leishmania (Viannia) peruviana. Treatment given: IV sodium stibogluconate 20 mg/kg/day × 20 days plus topical imiquimod; good epithelialisation by day 20 and scar formation without relapse at 3 months. The chapter also reviews treatment-failure risk factors (young age, short stay in endemic area, multiple lesions, Viannia complex species) and systemic therapy options when topical therapy is inadequate. :contentReference[oaicite:0]{index=0}:contentReference[oaicite:1]{index=1}"	"**System 1 (Intuitive snapshot)**
+Solitary, chronic, painless ulcer with indurated border on the face of a child who visited an Andean valley immediately evokes the mental template of New-World cutaneous leishmaniasis (CL).
+
+**System 2 (Structured analysis)**
+
+1. **Information Gathering**
+    
+    – Key local findings: 4-month evolution, raised borders, “cobblestone” base, absence of pain, lymph nodes, or systemic signs.
+    
+    – Epidemiology: recent stay in rural Andean zone—known Leishmania (Viannia) transmission by Lutzomyia sand flies; age and outdoor exposure raise risk.
+    
+    – Negatives: no trauma to suggest sporotrichosis inoculation; no prolonged fever, weight loss, or pulmonary findings to suggest TB; no rapidly progressive necrosis to suggest anthrax; lesion ulcerated (rare for Balamuthia).
+    
+    – Red flags: facial location (risk of mucosal dissemination in Viannia species); paediatric host at higher risk of treatment failure.
+    
+2. **Hypothesis Generation**
+    
+    Differential ranked by likelihood:
+    
+    • **Cutaneous leishmaniasis (Viannia complex)** – classic painless ulcer, travel to endemic valley, raised border.
+    
+    • Sporotrichosis – endemic in Peruvian Andes but usually painful, lymphocutaneous spread common, requires traumatic inoculation.
+    
+    • Cutaneous tuberculosis / atypical mycobacteria – possible in high-TB-burden areas; would expect slower indolent plaque or verrucous lesion, often multiple.
+    
+    • Balamuthia mandrillaris – rare; tends to present as violaceous plaque, ulceration uncommon.
+    
+    • Impetiginised insect bite / ecthyma – would be painful, often multiple, faster evolution.
+    
+    Pathophysiology script for CL: sand-fly bite deposits promastigotes → uptake by macrophages → intracellular amastigote replication → delayed-type hypersensitivity drives granulomatous ulcer with raised border.
+    
+3. **Hypothesis Testing**
+    
+    – Initial bedside test: dermal scraping from ulcer edge for Giemsa smear (looking for intracellular amastigotes). Sensitivity ~70 %; negative does not exclude CL in chronic lesions.
+    
+    – If smear negative, perform leishmanin (Montenegro) skin test; positive supports prior exposure but not active infection.
+    
+    – Definitive: PCR on lesion tissue for Leishmania DNA; provides species-level ID guiding therapy (Viannia species warrant systemic Rx).
+    
+    – Tests to rule out alternates: Sabouraud culture or KOH prep (Sporothrix), PPD and biopsy for mycobacteria.
+    
+    – Avoid diagnostic anchoring: ensure smear or PCR performed even if clinical picture compelling.
+    
+4. **Reflection & Final Diagnosis**
+    
+    Clinical pattern, epidemiologic exposure, and characteristic ulcer morphology strongly indicate **localized cutaneous leishmaniasis**. Positive leishmanin test and PCR for *Leishmania (Viannia) peruviana* confirm. No features support sporotrichosis or TB; Balamuthia unlikely.
+    
+
+**Most Likely Diagnosis** Localized cutaneous leishmaniasis due to *Leishmania (Viannia) peruviana*.
+
+**Immediate Management / Public-Health Action**
+
+• Begin systemic therapy: IV sodium stibogluconate 20 mg/kg/day for 20 days (Peruvian first-line for Viannia CL), with baseline and weekly ECG and pancreatic/liver enzymes to monitor toxicity.
+
+• Adjunct topical imiquimod every other day to enhance local immune response (evidence of benefit in facial lesions).
+
+• Counsel family on treatment toxicities, necessity of adherence, and warning signs of mucosal spread (nasal congestion, epistaxis).
+
+• Schedule follow-up at 1, 3, and 6 months; failure or relapse in ~25 % of paediatric patients—be prepared to switch to liposomal amphotericin B or miltefosine if needed.
+
+• Preventive advice: insecticide-impregnated bed nets, protective clothing for future travel; notify regional health authority for surveillance since CL is reportable in Peru.
+
+• Psychosocial support for potential scarring; consider referral for reconstructive assessment once cured."	[[Yes]]	[[Yes]]	[[Yes]]
+2	Example 3	"Could you please evaluate the following patient case and provide a comprehensive diagnostic reasoning pathway using both System 1 (intuitive pattern-recognition) and System 2 (analytical hypothesis testing)?
+
+Patient Case
+
+• Demographics 26-year-old Malawian woman, urban resident, vegetable seller, widowed; three living children, four toddlers previously died.
+
+• Present illness One week of progressive holocranial headache, now severe; two days of intermittent confusion and irritability; left-sided eyelid drooping noted 24 h ago. No seizures.
+
+• Review of systems Low-grade fever, malaise, no cough, no night sweats reported by relatives; no photophobia, no rash.
+
+• Exposure / risk Lives in high-density township; husband died last year of “high fever”; no recent travel; no known TB treatment history; no ART; unknown HIV status.
+
+• Examination on arrival Glasgow Coma Scale 14/15; temperature 38.4 °C; BP 115/75 mmHg; HR 86 bpm; RR 18/min. Neck supple. Isolated complete left ptosis with eye “down and out” (pupil mid-dilated, sluggish) consistent with cranial nerve III palsy. No focal limb deficits. Chest clear, abdomen soft, no lymphadenopathy.
+
+• Initial laboratory data WBC 3.2 × 10⁹/L (lymphopenic), Hb 10.2 g/dL, platelets 155 × 10⁹/L, serum glucose 4.0 mmol/L, malaria/thick film negative.
+
+• Lumbar puncture Opening pressure 32 cm H₂O (raised). CSF: 54 cells/µL (mainly lymphocytes), protein 3.0 g/L (very high), glucose 1.3 mmol/L (serum: 4.0 mmol/L).
+
+• Initial action Empiric IV ceftriaxone started; manometer-guided CSF drainage of 10 mL performed; awaiting stain/culture/PCR results, CrAg and HIV testing.
+
+Please discuss the full differential for a meningitic presentation with cranial neuropathy in Malawi, propose definitive investigations, and outline urgent management including public-health considerations.
+
+Let’s think step by step."	"Clinical Cases in Tropical Medicine, 2nd Edition – Chapter 3 “A 26-Year-Old Woman from Malawi with Headache, Confusion and Unilateral Ptosis”  
+The narrative describes a Malawian woman presenting after one week of headache, two days of confusion, and new left ptosis. Examination: febrile (38.4 °C), GCS 14, no neck stiffness, isolated third-nerve palsy. Blood tests showed leukopenia and mild anaemia; malaria smear negative. CSF opening pressure markedly raised at 32 cm H₂O; CSF lymphocytic pleocytosis (54/µL), protein 3.0 g/L, glucose 1.3 mmol/L (serum 4.0 mmol/L). Differential listed: acute bacterial, tuberculous, and cryptococcal meningitis; cerebral malaria considered less likely. Pragmatic treatment covering all three causes was initiated (ceftriaxone, fluconazole, standard anti-TB regimen). HIV serology returned positive. India ink, cryptococcal antigen, and bacterial culture were negative, but Ziehl–Neelsen stain showed acid-fast bacilli in CSF, confirming tuberculous meningitis. Despite therapy the patient developed bilateral basal ganglia infarcts and died. The chapter details WHO recommendations for Xpert Ultra PCR, standard 9- to 12-month anti-TB regimen plus corticosteroids, and emphasises starting treatment before confirmatory results in high-TB settings. :contentReference[oaicite:0]{index=0}:contentReference[oaicite:1]{index=1}"	"System 1 (intuitive snapshot)  
+Young adult in a high-TB/HIV prevalence country with subacute headache, lymphocytic high-protein low-glucose CSF, isolated cranial nerve palsy, and very high opening pressure instantly fits the template of tuberculous meningitis (TBM).
+
+System 2 (structured analysis)
+
+1. Information Gathering
+    
+    • Syndrome: meningitis with raised intracranial pressure and cranial nerve III palsy.
+    
+    • CSF profile: lymphocyte-predominant pleocytosis, markedly elevated protein, very low glucose—classic for TBM; cryptococcosis can mimic but usually in CD4 < 100 cells/µL and often has lower protein. Acute bacterial meningitis classically has polymorph predominance.
+    
+    • Epidemiologic context: Malawi is high-burden for TB and HIV; husband’s febrile death suggests possible TB exposure.
+    
+    • Risk factors: probable HIV infection (later confirmed), malnutrition (anaemia, leukopenia).
+    
+    • Red-flag complications: focal vasculitic infarction risk, obstructive hydrocephalus, brain-stem herniation.
+    
+2. Hypothesis Generation
+    
+    Differential probability ranking:
+    
+    • Tuberculous meningitis – prolonged prodrome, cranial neuropathy, CSF pattern.
+    
+    • Cryptococcal meningitis – consider in HIV; but isolated CN III palsy less common, India ink/CrAg pending.
+    
+    • Partially treated bacterial meningitis – less likely; duration > 7 days, CSF lymphocytic.
+    
+    • Lymphocytic malignant meningitis (e.g., lymphoma) – unlikely given acute evolution.
+    
+    • Cerebral toxoplasmosis with ventriculitis – usually multiple ring lesions on CT, not predominantly meningitic.
+    
+    Pathophysiology script for TBM: inhaled Mycobacterium tuberculosis seeds meningeal vessels → subependymal Rich focus ruptures into subarachnoid space → gelatinous exudate at basal cisterns → obstructive hydrocephalus, cranial nerve entrapment, obliterative arteritis → infarcts and neuropathies.
+    
+3. Hypothesis Testing
+    
+    • Immediate stains: Ziehl–Neelsen (low sensitivity) – already positive in this case.
+    
+    • Molecular: Xpert MTB/RIF Ultra on CSF; > 95 % specificity even in paucibacillary samples.
+    
+    • Cryptococcal Ag lateral flow assay: negative rules out most disease in HIV+ patients.
+    
+    • Bacterial culture/Gram stain: negative so far; continue ceftriaxone while awaiting results.
+    
+    • Neuroimaging: CT or MRI for hydrocephalus, infarcts, tuberculomas; MRI later revealed basal ganglia infarcts typical of TBM vasculitis.
+    
+    • Bias checks: anchoring on TB—ensure CrAg and bacterial tests done; confirmation with molecular assay essential when acid-fast stain negative.
+    
+4. Reflection & Final Diagnosis
+    
+    Constellation of subacute course, CSF findings, cranial nerve III palsy, elevated opening pressure, acid-fast bacilli, and MRI vasculitic infarcts confirms tuberculous meningitis. Cryptococcal and bacterial causes ruled out by negative CrAg and cultures.
+    
+
+Most Likely Diagnosis
+
+Tuberculous meningitis (stage II) in an HIV-positive adult.
+
+Immediate Management / Public-Health Action
+
+• Anti-TB therapy: isoniazid 5 mg/kg, rifampicin 10 mg/kg, pyrazinamide 25 mg/kg, ethambutol 20 mg/kg for 2 months, followed by isoniazid-rifampicin for total 12 months.
+
+• Adjunct corticosteroid: dexamethasone 0.4 mg/kg/day taper over 6 weeks (reduces mortality and neurologic sequelae).
+
+• Raised ICP: serial therapeutic lumbar punctures or ventriculoperitoneal shunt if hydrocephalus develops; elevate head 30 °, hyperosmolar therapy if needed.
+
+• Empiric antibiotics until bacterial meningitis excluded; discontinue once cultures negative at 48 h.
+
+• Initiate fluconazole only if CrAg positive (not required here).
+
+• Confirm HIV; baseline CD4, viral load; start antiretroviral therapy two to eight weeks after TB treatment initiation to reduce paradoxical IRIS risk.
+
+• Nursing measures: frequent neuro-checks, maintain euglycaemia and normonatraemia, prevent pressure sores.
+
+• Public health: notify national TB program; screen household contacts (especially children) with symptom review and chest X-ray; provide isoniazid preventive therapy where appropriate.
+
+• Counsel family on airborne precautions for pulmonary TB sources, HIV testing, and importance of adherence to prolonged therapy."	[[Yes]]	[[Yes]]	[[Yes]]
+3	Example 4	"Could you please evaluate the following patient case and provide a comprehensive diagnostic reasoning pathway using both System 1 (intuitive pattern-recognition) and System 2 (analytical hypothesis testing)?
+
+Patient Case
+
+• Demographics 4-year-old Ugandan girl, previously healthy, lives in rural eastern Uganda (high seasonal malaria transmission).
+
+• Present illness Yesterday afternoon developed severe headache → evening shaking chills; family planned clinic visit next morning. Found at 05:00 in a 10-minute generalized seizure and has remained unconscious for 4 h en route to hospital. No trauma, toxins, or prior chronic disease reported.
+
+• Examination (on arrival) T 38.7 °C, HR 150 bpm, RR 36/min, BP 98/40 mmHg. Blantyre Coma Score 1/5; pupils 2 mm reactive; normal oculocephalic reflexes. No neck stiffness or jaundice. Decerebrate posturing with stimulation. Gallop rhythm, hepatomegaly 2 cm, splenomegaly 4 cm. Capillary refill normal; random glucose normal.
+
+• Point-of-care tests / labs Malaria RDT positive. Haematocrit 17.6 % (severe anaemia), platelets 28 × 10⁹/L (severe thrombocytopenia).
+
+• Prior treatment None before arrival.
+
+Please discuss the full differential diagnosis of coma with positive malaria RDT in an African child, propose essential investigations, and outline immediate evidence-based management and public-health actions.
+
+Let’s think step by step."	"Clinical Cases in Tropical Medicine, 2nd Edition – Chapter 4 “A 4-Year-Old Girl from Uganda in a Coma”  
+The case describes a comatose 4-year-old Ugandan girl during the rainy season. She had headache, chills, an early-morning seizure, and persistent coma. Vital signs: T 38.7 °C, HR 150 bpm, BP 98/40 mmHg. Blantyre Coma Score 1/5; no neck stiffness; hepatosplenomegaly. Malaria RDT positive; haematocrit 17.6 %, platelets 28 × 10⁹/L. Differential diagnoses highlighted: cerebral malaria, acute bacterial meningitis, viral encephalitis, organophosphate intoxication, metabolic derangements, non-convulsive status epilepticus. WHO definition of cerebral malaria (“otherwise unexplained coma with parasitaemia”) is noted to be non-specific because asymptomatic parasitaemia is common. Authors emphasise lumbar puncture to exclude meningitis, ophthalmoscopy for malarial retinopathy (retinal whitening, haemorrhages, orange vessels) to support cerebral malaria, and EEG to exclude non-convulsive seizures. Case continuation: CSF clear/acellular; normal opening pressure; ophthalmoscopy showed white-centred haemorrhages → diagnosis retinopathy-positive cerebral malaria; treated with IV artesunate, intensive monitoring; recovered consciousness by 40 h and discharged day 5 with neurology follow-up. Mortality of cerebral malaria 15–25 %, one-third survivors with neuro-sequelae. :contentReference[oaicite:0]{index=0}:contentReference[oaicite:1]{index=1}"	"**System 1 (intuitive snapshot)**  
+Seasonal pattern, rapid progression from febrile illness to seizure and deep coma, positive malaria test, severe anaemia/thrombocytopenia, and hepatosplenomegaly evoke the mental template of cerebral malaria.
+
+**System 2 (structured analysis)**
+
+1. Information Gathering
+    
+    • Syndrome: acute non-focal coma with single seizure, no meningism, normal glucose.
+    
+    • Key positives: malaria RDT+, severe anaemia & thrombocytopenia (high parasite biomass), hepatosplenomegaly, gallop rhythm (high-output anaemic state).
+    
+    • Key negatives: no neck stiffness (though coma limits sensitivity), no jaundice (argues against fulminant hepatitis), no toxic ingestion history.
+    
+    • Epidemiology: high-transmission rural Uganda during rainy season; high likelihood of Plasmodium falciparum exposure.
+    
+    • Red flags: Blantyre 1/5 (deep coma), decerebrate posturing, severe thrombocytopenia → high mortality risk.
+    
+2. Hypothesis Generation
+    
+    Differential (descending probability):
+    
+    • Cerebral malaria (retinopathy-positive or -negative).
+    
+    • Acute bacterial meningitis (can coexist; neck supple ≠ rule out).
+    
+    • Herpes simplex/arboviral encephalitis.
+    
+    • Organophosphate poisoning (would expect muscarinic signs, bradycardia, pinpoint pupils).
+    
+    • Post-ictal state after prolonged seizure (unlikely after 4 h).
+    
+    • Metabolic encephalopathy (hypoglycaemia, uremia, hepatic failure) – initial glucose & perfusion normal.
+    
+    Pathophysiology script for cerebral malaria: Pf-infected erythrocytes express PfEMP1 → cytoadherence to cerebral micro-endothelium → sequestration, microvascular obstruction, blood-brain barrier dysfunction, cytokine surge → cerebral oedema, seizures, coma.
+    
+3. Hypothesis Testing
+    
+    Immediate bedside/POC:
+    
+    • Finger-stick glucose (done, normal).
+    
+    • Thick & thin smear for parasite density; HRP2 RDT already positive.
+    
+    Essential investigations:
+    
+    • Lumbar puncture to rule out bacterial meningitis (CSF cell count, culture, rapid antigen tests).
+    
+    • Ophthalmoscopy for malarial retinopathy – presence of retinal whitening/haemorrhages highly specific for cerebral malaria.
+    
+    • If available, EEG to exclude non-convulsive status epilepticus.
+    
+    • Basic biochemistry (electrolytes, creatinine, bilirubin) to detect complications.
+    
+    Bias check: anchoring on malaria—positive RDT common; must LP every comatose child unless contraindicated; treat empirically for meningitis until CSF results known.
+    
+4. Reflection & Final Diagnosis
+    
+    Clear CSF with normal pressure, presence of malarial retinopathy, severe anaemia/thrombocytopenia, and rapid neurologic improvement on artesunate support **retinopathy-positive cerebral malaria**. Alternate diagnoses (bacterial meningitis, encephalitis, toxins) less likely but initially covered.
+    
+
+Most Likely Diagnosis
+
+Retinopathy-positive cerebral malaria due to *Plasmodium falciparum*.
+
+Immediate Management / Public-Health Action
+
+• Antimalarial: IV artesunate 2.4 mg/kg at 0, 12, 24 h then daily until oral tolerated; transition to 3-day ACT (artemether–lumefantrine).
+
+• Supportive care: high-dependency monitoring; maintain normoglycaemia & normoxia; treat seizures with IV diazepam/phenobarbital; manage fever with paracetamol; transfuse packed RBCs if Hb < 5 g/dL or symptomatic.
+
+• Manage raised ICP: elevate head 30°, control seizures, avoid over-hydration; mannitol generally not beneficial in cerebral malaria.
+
+• Empiric broad-spectrum antibiotics (e.g., ceftriaxone) until meningitis excluded; discontinue once CSF negative.
+
+• Screen for hypoglycaemia every 6 h; check electrolytes daily; monitor urine output for acute kidney injury.
+
+• Neurological observation: Blantyre/Glasgow scores q2–4 h; anticipate neuro-sequelae—arrange follow-up cognitive/epilepsy screening.
+
+• Family & community education: importance of bed-nets, timely fever evaluation; report case to district malaria surveillance for cluster detection.
+
+• Consider intermittent preventive treatment for siblings < 5 years and seasonal chemoprevention if implemented locally."	[[Yes]]	[[Yes]]	[[Yes]]
+4	Example 5	"Could you please evaluate the following patient case and provide a comprehensive diagnostic reasoning pathway using both System 1 (intuitive pattern-recognition) and System 2 (analytical hypothesis testing)?
+
+Patient Case
+
+• Demographics  4-year-old boy from a remote rice-farming district in northern Laos; lives with subsistence-farming family in extreme poverty.
+
+• Present illness  Three-day history of a dark ulcer on the right cheek that progressed explosively to destroy both upper and lower lips and adjacent cheek tissue; foul breath, refusal to eat, marked lethargy.
+
+• Past medical history  Unimmunised; had fever and generalised rash two months ago consistent with measles; no prior hospitalisation, no known HIV exposure.
+
+• Nutritional status  Stunted and under-weight for age (weight-for-age Z-score ≈ -3).
+
+• Examination  Chronically malnourished child, febrile 38.2 °C, pulse 124 bpm, BP 86/50 mmHg. Right oro-facial defect 4 × 5 cm with black necrotic edges exposing teeth and gingiva; fetor oris; moderate cervical lymphadenopathy; no peripheral oedema; lung, heart and abdomen otherwise unremarkable.
+
+• Investigations to date  None available locally.
+
+• Initial therapy  Local clinicians uncertain; no antibiotics started.
+
+Please outline your differential diagnosis for a rapidly destructive facial ulcer in a malnourished child, specify key investigations feasible in a district hospital, and propose an evidence-based immediate management plan plus long-term rehabilitation considerations.
+
+Let’s think step by step."	"Clinical Cases in Tropical Medicine, 2nd Edition – Chapter 5 “A 4-Year-Old Boy from Laos With a Lesion of the Lip and Cheek”  
+The chapter describes a chronically under-nourished, unimmunised four-year-old Lao boy who developed a foul-smelling sore on his cheek that, within three days, destroyed portions of the upper and lower lip and right cheek, leaving teeth exposed. The lesion is characterised as gangrenous and rapidly progressive. The authors state that the clinical picture is typical of noma (cancrum oris), an opportunistic infection in children aged 1–7 years whose immunity is compromised by malnutrition and antecedent infections such as measles or malaria. Differential diagnoses considered include dental abscess with cellulitis, oral cancer, syphilis, yaws, cutaneous or mucocutaneous leishmaniasis, all deemed unlikely given the child’s age and the lesion’s fulminant course. Recommended immediate therapy is high-dose penicillin plus metronidazole to cover synergistic aerobic and anaerobic oral flora, aggressive nutritional rehabilitation with liquefied high-protein foods, evaluation for co-morbid infections (malaria, helminths, tuberculosis, vitamin deficiencies), debridement of necrotic tissue, physiotherapy to prevent contractures, and delayed reconstructive surgery (> 1 year) by specialists. Untreated noma has a 70–90 % fatality rate; early antibiotics and nutrition markedly improve survival. :contentReference[oaicite:0]{index=0}:contentReference[oaicite:1]{index=1}"	"System 1 (intuitive snapshot)  
+A severely malnourished preschool child in rural Southeast Asia with a foul-smelling, rapidly gangrenous oro-facial ulcer immediately matches the mental template of noma (cancrum oris).
+
+System 2 (structured analysis)
+
+1. Information Gathering
+    
+    • Key findings: fulminant necrosis of lips/cheek, fetor oris, rapid progression ≤ 72 h, malnutrition, measles two months prior, no prior antibiotics.
+    
+    • Epidemiology: extreme poverty, unimmunised, poor oral hygiene, livestock proximity, remote district with limited health services.
+    
+    • Negatives: no history suggesting chemical burn or caustic ingestion; lesion pace far exceeds typical bacterial cellulitis or leishmaniasis; syphilis and yaws uncommon at this age.
+    
+    • Red flags: septic shock risk, airway compromise, impending trismus/contractures.
+    
+2. Hypothesis Generation
+    
+    Primary differential (descending likelihood):
+    
+    • Noma (necrotising ulcerative stomatitis progressing to cancrum oris).
+    
+    • Fulminant necrotising fasciitis of odontogenic origin.
+    
+    • Diptheritic ulcer (rare with vaccination gaps but slower tissue loss).
+    
+    • Rapidly progressive cutaneous leishmaniasis—unlikely in Laos and typically slower.
+    
+    • Buruli ulcer—endemic in West Africa, not Laos, and slower.
+    
+    Pathophysiology script for noma: synergy of anaerobic (Prevotella, Fusobacterium) and facultative aerobic bacteria on background of necrotising ulcerative gingivitis → mucosal breach → unchecked polymicrobial invasion of soft tissue and fascia in immuno-nutritionally compromised host → vasculitis, thrombosis, gangrene.
+    
+3. Hypothesis Testing
+    
+    • Essential but limited diagnostics: bedside glucose, full blood count (anaemia, neutrophils), malaria smear, HIV rapid test, basic electrolytes.
+    
+    • Microbiology: swab for Gram stain/anaerobic culture rarely alters early management; blood cultures if septic.
+    
+    • Imaging: not required acutely; later facial X-ray/CT for surgical planning.
+    
+    • Biopsy not indicated; diagnosis clinical.
+    
+    • Bias checks: ensure measles-related immunosuppression or underlying HIV not missed; keep necrotising fasciitis on radar if deterioration despite therapy.
+    
+4. Reflection & Final Diagnosis
+    
+    Tempo of destruction, classic risk triad (malnutrition, recent measles, poverty), and anatomic distribution confirm noma. Alternative diagnoses do not explain three-day tissue loss of this magnitude in a four-year-old.
+    
+
+Most Likely Diagnosis
+
+Acute noma (cancrum oris) in a severely malnourished, unimmunised Laotian child.
+
+Immediate Management / Public-Health Action
+
+• Begin intravenous crystalline penicillin 50 000 IU/kg q6 h plus intravenous metronidazole 10 mg/kg q8 h for 7-10 days; switch to oral when improving.
+
+• Aggressive nutritional rehabilitation: nasogastric or spoon-fed liquefied high-protein local foods (egg, soy, peanut, milk) to achieve 120 kcal/kg/day; address micronutrient deficits with multivitamins, zinc, vitamin A.
+
+• Screen and treat comorbidities: malaria (rapid test/smear), intestinal helminths (single-dose albendazole), tuberculosis screen, HIV test with counselling.
+
+• Daily gentle debridement of necrotic tissue after initiating antibiotics; saline or dilute chlorhexidine mouth rinses; maintain oral hygiene with soft brush when tolerated.
+
+• Early physiotherapy of jaw and perioral muscles to reduce contractures.
+
+• Counsel family on oral hygiene, nutrition, and completion of immunisations; arrange measles and DTP vaccination once stabilised.
+
+• Plan staged reconstructive surgery after at least 12 months of nutritional recovery; refer to NGO or tertiary craniofacial team experienced with noma.
+
+• Notify district health authorities: noma is a sentinel indicator of extreme poverty; trigger community nutrition and vaccination outreach, water-sanitation assessment, and public-health education.
+
+• Document case for national neglected-tropical-disease registry and advocate for inclusion in integrated child-health programmes."	[[Yes]]	[[Yes]]	[[Yes]]
