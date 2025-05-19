@@ -2,12 +2,8 @@
 
 import os
 import re
-import ast
-import json
 import time
 import random
-import argparse
-import statistics
 import warnings
 import subprocess as sp
 import datetime
@@ -15,7 +11,6 @@ import datetime
 import numpy as np
 import pandas as pd
 import pyarrow as pa
-import pyarrow.dataset as ds
 
 import torch
 import torch.nn as nn
@@ -28,14 +23,12 @@ from tqdm import tqdm, tqdm_pandas
 from tqdm.auto import tqdm
 
 from transformers import (
-    PreTrainedTokenizer, T5Tokenizer, T5EncoderModel, T5ForConditionalGeneration,
-    BertModel, AutoTokenizer, AutoModel, GPT2Tokenizer,
-    TrainingArguments, get_scheduler,
+    PreTrainedTokenizer, AutoTokenizer, AutoModel, get_scheduler,
     AutoModelForCausalLM, AutoConfig, AutoModelForSequenceClassification
 )
 
 import datasets
-from datasets import load_metric
+from evaluate import load as load_metric
 
 warnings.filterwarnings(
     "ignore", 

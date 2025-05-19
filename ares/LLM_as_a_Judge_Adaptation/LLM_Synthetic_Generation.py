@@ -1,6 +1,3 @@
-from together import Together
-from openai import AzureOpenAI
-from openai import OpenAI
 import os
 
 def generate_synthetic_query_api_approach(document: str, synthetic_query_prompt: str, prompt: str, length_of_fewshot_prompt: int, 
