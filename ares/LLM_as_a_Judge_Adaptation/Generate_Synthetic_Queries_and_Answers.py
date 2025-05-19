@@ -528,7 +528,8 @@ def generate_synthetic_queries(documents: pd.DataFrame, settings: dict) -> pd.Da
     num_to_sample = len(documents)
     
     # Step 2: Check if we have enough unique queries (at least 2 per document)
-    while len(positive_queries_df) < num_to_sample * 2:
+    #ga1nang: change 2 to initial_queries_per_document
+    while len(positive_queries_df) < num_to_sample * initial_queries_per_document:
         print("Warning: Not enough unique positive queries. Generating more...")
         additional_queries = generate_positive_synthetic_queries(documents, settings, chunk_size)
         positive_queries_df = pd.concat([positive_queries_df, additional_queries]).drop_duplicates(subset=['document', 'synthetic_query'])
