@@ -4,11 +4,8 @@ from .synthetic_generator import synthetic_generator_config
 from .binary_classifier import binary_classifer_config
 from .rag_scoring import rag_scoring_config
 from .ues_idp import ues_idp_config
-from .kilt_filter import KILT_dataset_process
-from .superglue_filter import superGlue
 from .label_filter import filter_tsv_by_label
 from .prompts import context_relevance_system_prompt, answer_relevance_system_prompt, answer_faithfulness_system_prompt
-from typing import List
 
 class ARES:
     """
@@ -162,18 +159,6 @@ class ARES:
         Executes the UES IDP configuration.
         """
         return ues_idp_config(**self.ues_idp_config)
-
-    def KILT_dataset(self, dataset_name):
-        """
-        Processes the KILT dataset with the specified dataset name.
-        """
-        KILT_dataset_process(dataset_name)
-
-    def superGlue_dataset(self, dataset_name):
-        """
-        Processes the SuperGlue dataset with the specified dataset name.
-        """
-        superGlue(dataset_name)
     
     def filter_tsv_by_label(self, tsv_file, label, output_file=None):
         """

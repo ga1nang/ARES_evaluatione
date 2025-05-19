@@ -13,11 +13,8 @@ from .LLM_as_a_Judge_Adaptation.General_Binary_Classifier import (
     print_and_save_model,
     set_random_seed
 )
-from tqdm import tqdm
 import torch
-import pandas as pd
-import sys
-import warnings
+
 
 def binary_classifer_config(
     training_dataset: list,

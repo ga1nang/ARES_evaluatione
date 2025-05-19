@@ -1,8 +1,5 @@
 import pandas as pd
-import torch
-import openai
 import sys
-from transformers import AutoTokenizer, AutoModelForCausalLM
 from ares.RAG_Automatic_Evaluation.Evaluation_Functions import few_shot_answer_faithfulness_scoring 
 from ares.RAG_Automatic_Evaluation.Evaluation_Functions import few_shot_answer_relevance_scoring
 from ares.RAG_Automatic_Evaluation.Evaluation_Functions import few_shot_context_relevance_scoring

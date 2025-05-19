@@ -1,51 +1,39 @@
-
-import ast
-import copy
-import csv
-import json
-import pdb
 import random
-import time
 import warnings
 
 import numpy as np
-import openai
 import pandas as pd
-import requests
-import torch
 from datasets import Dataset
-from openai import OpenAI
 from pandas.errors import SettingWithCopyWarning
 from tqdm import tqdm
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 
-def get_embedding(text: str, model: str = "text-embedding-ada-002") -> list:
-    """
-    Generates an embedding for the given text using the specified model.
+# def get_embedding(text: str, model: str = "text-embedding-ada-002") -> list:
+#     """
+#     Generates an embedding for the given text using the specified model.
 
-    Parameters:
-    text (str): The input text to generate the embedding for.
-    model (str): The model to use for generating the embedding. Default is "text-embedding-ada-002".
+#     Parameters:
+#     text (str): The input text to generate the embedding for.
+#     model (str): The model to use for generating the embedding. Default is "text-embedding-ada-002".
 
-    Returns:
-    list: A list representing the embedding of the input text.
-    """
-    client = OpenAI()
+#     Returns:
+#     list: A list representing the embedding of the input text.
+#     """
+#     client = OpenAI()
     
-    # Replace newline characters with spaces
-    text = text.replace("\n", " ")
+#     # Replace newline characters with spaces
+#     text = text.replace("\n", " ")
     
-    # Truncate text to the first 50 words if it exceeds 50 words
-    if len(text) > 50:
-        text = " ".join(text.split(" ")[:50])
+#     # Truncate text to the first 50 words if it exceeds 50 words
+#     if len(text) > 50:
+#         text = " ".join(text.split(" ")[:50])
     
-    # Attempt to generate the embedding up to 5 times in case of failure
-    for _ in range(5):
-        try:
-            return client.embeddings.create(input=[text], model=model).data[0].embedding
-        except Exception as e:
-            print(f"Error generating embedding: {e}. Attempting again...")
-            time.sleep(30)
+#     # Attempt to generate the embedding up to 5 times in case of failure
+#     for _ in range(5):
+#         try:
+#             return client.embeddings.create(input=[text], model=model).data[0].embedding
+#         except Exception as e:
+#             print(f"Error generating embedding: {e}. Attempting again...")
+#             time.sleep(30)
 
 def generate_index(dataframe: pd.DataFrame) -> Dataset:
     """
