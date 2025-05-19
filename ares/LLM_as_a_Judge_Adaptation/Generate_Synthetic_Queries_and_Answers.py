@@ -166,6 +166,79 @@ def load_documents(document_filepath: str, clean_documents: bool, documents_samp
 
     return documents
 
+def load_documents_from_json_folder(folder_path: str, clean_documents: bool, documents_sampled: int) -> pd.DataFrame:
+    """
+    Loads and processes structured JSON documents from a directory.
+
+    Args:
+        folder_path (str): The path to the directory containing JSON files.
+        clean_documents (bool): Whether to clean the document texts.
+        documents_sampled (int): Number of documents to sample.
+
+    Returns:
+        pd.DataFrame: A DataFrame with processed documents.
+    """
+    documents = []
+    file_list = [f for f in os.listdir(folder_path) if f.endswith(".json")]
+
+    for file in file_list:
+        file_path = os.path.join(folder_path, file)
+        
+        with open(file_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        # Combine text from all fields except excluded ones
+        excluded_keys = {"Extracted Figure", "Further Reading"}
+        combined_text = ""
+        for key, value in data.items():
+            if key not in excluded_keys:
+                combined_text += f"{key}:\n{value}\n\n"
+
+        # Add figure descriptions if available
+        descriptions = []
+        for figure_group in data.get("Extracted Figure", []):
+            for figure in figure_group:
+                desc = figure.get("Description", "")
+                if desc:
+                    descriptions.append(desc)
+
+        if descriptions:
+            combined_text += "Figure Descriptions:\n"
+            combined_text += "\n".join(descriptions)
+
+        # Optionally clean the document
+        if clean_documents:
+            combined_text = clean_document(combined_text)  # Make sure you define this function
+
+        documents.append(combined_text.strip())
+
+    # Create DataFrame
+    df = pd.DataFrame(documents, columns=["document"])
+
+    # Filter out documents with fewer than 50 words
+    initial_count = len(df)
+    df = df[df['document'].str.split().apply(len) >= 50]
+    after_filter_count = len(df)
+
+    if after_filter_count == 0:
+        sys.exit("All documents were less than 50 words. Please provide longer documents.")
+
+    if documents_sampled > initial_count:
+        print(f"\n`documents_sampled` ({documents_sampled}) > available ({initial_count}). Adjusting to {initial_count}.\n")
+        documents_sampled = initial_count
+
+    if initial_count - after_filter_count > 0:
+        print(f"Filtered out {initial_count - after_filter_count} documents with fewer than 50 words.")
+        if documents_sampled > after_filter_count:
+            print(f"Sampling adjusted to {after_filter_count} after filtering.")
+            documents_sampled = after_filter_count
+
+    # Sample
+    df = df.sample(n=documents_sampled)
+
+    return df
+
+
 def load_few_shot_prompt(few_shot_prompt_filename: str, for_fever_dataset: bool, for_wow_dataset: bool) -> tuple[str, int]:
     """
     Loads and processes a few-shot prompt from a TSV file.
