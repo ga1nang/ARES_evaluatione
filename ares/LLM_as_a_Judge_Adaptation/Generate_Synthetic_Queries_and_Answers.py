@@ -21,7 +21,6 @@ from ares.LLM_as_a_Judge_Adaptation.LLM_Generation_Functions import (check_gener
                                                                       )
 
 from ares.LLM_as_a_Judge_Adaptation.LLM_Synthetic_Generation import (generate_synthetic_query_api_approach,
-                                                                     generate_synthetic_query_azure_approach,
                                                                     generate_synthetic_answer_api_approach,
                                                                     generate_synthetic_answer_azure_approach)
 
