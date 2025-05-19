@@ -1,22 +1,11 @@
-import argparse
-import ast
-import copy
-import csv
 import json
-import pdb
 import re
-import requests
 import sys
-import time
-import warnings
-import together
 import os
 
 import numpy as np
-import openai
 import pandas as pd
 import torch
-from datasets import Dataset
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 from transformers import (AutoModelForCausalLM, AutoModelForSeq2SeqLM,
@@ -36,12 +25,9 @@ from ares.LLM_as_a_Judge_Adaptation.LLM_Synthetic_Generation import (generate_sy
                                                                     generate_synthetic_answer_api_approach,
                                                                     generate_synthetic_answer_azure_approach)
 
-from ares.LLM_as_a_Judge_Adaptation.vLLM_Generation_Functions import (generate_synthetic_query_vllm_approach,
-                                                                generate_synthetic_answer_vllm_approach)
 
 import os
-import multiprocessing
-from vllm import LLM
+
 
 pd.set_option('display.max_columns', None) 
 pd.set_option('display.max_rows', None)  
