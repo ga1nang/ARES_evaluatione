@@ -370,19 +370,7 @@ def generate_query(document: str, settings: dict) -> list:
         list: List of generated synthetic queries.
     """
 
-    if settings['azure_openai_config'] == True:
-        return generate_synthetic_query_azure_approach(
-            document, 
-            settings['azure_openai_config'],
-            settings["synthetic_query_prompt"], 
-            settings['few_shot_examples'], 
-            settings['length_of_fewshot_prompt'], 
-            settings['model'], 
-            settings['percentiles'], 
-            settings['for_fever_dataset'], 
-            settings['for_wow_dataset']
-        )
-    elif settings['api_model']:
+    if settings['api_model']:
         return generate_synthetic_query_api_approach( # LLM_Synth_Gen
             document, 
             settings["synthetic_query_prompt"], 
@@ -393,18 +381,6 @@ def generate_query(document: str, settings: dict) -> list:
             settings['for_fever_dataset'], 
             settings['for_wow_dataset']
         )
-    elif settings['vllm']:
-        return generate_synthetic_query_vllm_approach( # VLLM_Synth_Gen
-        document, 
-        settings["synthetic_query_prompt"], 
-        settings['few_shot_examples'], 
-        settings['length_of_fewshot_prompt'], 
-        settings['tokenizer'],
-        settings['model'], 
-        settings['host_url'],
-        settings['percentiles'], 
-        settings['for_fever_dataset'], 
-        settings['for_wow_dataset'])
     else: 
         return generate_synthetic_query_llm_approach( # LLM_Generation
         document, 
