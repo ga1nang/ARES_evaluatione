@@ -59,6 +59,7 @@ def generate_synthetic_query_api_approach(document: str, synthetic_query_prompt:
     client = Together(api_key=TOGETHER_API_KEY)
     
     # Generate queries for each percentile, repeating to reach num_queries
+    # ga1nang: fix the temperature because this is medical
     for _ in range(num_queries):
         for percentile in percentiles:
             success = False

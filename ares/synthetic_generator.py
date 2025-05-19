@@ -5,7 +5,7 @@ from .LLM_as_a_Judge_Adaptation.Generate_Synthetic_Queries_and_Answers import (
     # generate_contradictory_answers,
     generate_few_shot_prompts,
     generate_synthetic_queries,
-    Generate_Synthetic_Answers
+    generate_synthetic_answers
 )
 
 import os
@@ -98,18 +98,10 @@ def synthetic_generator_config(
 
         documents = load_documents(document_filepath, clean_documents, documents_sampled)
 
+        #ga1nang change
         few_shot_examples, length_of_fewshot_prompt = load_few_shot_prompt(
             few_shot_prompt_filename, for_fever_dataset, for_wow_dataset
         )
-
-        # few_shot_examples_for_contradictory_answers = generate_contradictory_answers(
-        #     few_shot_prompt_filename, for_fever_dataset, for_wow_dataset
-        # )
-
-        answer_gen_few_shot_examples, length_of_fewshot_prompt_answer_gen = generate_few_shot_prompts(
-            few_shot_prompt_filename, for_fever_dataset, for_wow_dataset
-        )
-
         synthetic_queries_config = {
             'few_shot_examples': few_shot_examples,
             'length_of_fewshot_prompt': length_of_fewshot_prompt,
@@ -132,6 +124,13 @@ def synthetic_generator_config(
         }
 
         generate_synthetic_queries(documents, synthetic_queries_config)
+        # few_shot_examples_for_contradictory_answers = generate_contradictory_answers(
+        #     few_shot_prompt_filename, for_fever_dataset, for_wow_dataset
+        # )
+        #ga1nang change
+        answer_gen_few_shot_examples, length_of_fewshot_prompt_answer_gen = generate_few_shot_prompts(
+            few_shot_prompt_filename, for_fever_dataset, for_wow_dataset
+        )
 
         synthetic_answers_config = {
             'regenerate_answers': regenerate_answers,
@@ -155,4 +154,4 @@ def synthetic_generator_config(
             'azure_openai_config': azure_openai_config
         }
 
-        Generate_Synthetic_Answers(synthetic_queries_filename, synthetic_answers_config)
+        generate_synthetic_answers(synthetic_queries_filename, synthetic_answers_config)

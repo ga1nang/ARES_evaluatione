@@ -120,7 +120,9 @@ class ARES:
         """
         self.components = components or []
         if 'synthetic' in self.components:
-            self.setup_synthetic(configs.get('synthetic_query_generator', {}))
+            # ga1nang fix
+            # self.setup_synthetic(configs.get('synthetic_query_generator', {}))
+            self.synthetic_query_generator_config = self.prepare_config("synthetic_query_generator", configs.get('synthetic_query_generator', {}))
         self.ues_idp_config = self.prepare_config("ues_idp", configs.get("ues_idp", {}))
         self.classifier_model_config = self.prepare_config("classifier_model", configs.get("classifier_model", {}))
         self.ppi_config = self.prepare_config("ppi", configs.get("ppi", {}))
