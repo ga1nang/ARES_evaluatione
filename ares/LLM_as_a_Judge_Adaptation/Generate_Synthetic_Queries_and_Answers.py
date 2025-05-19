@@ -364,6 +364,7 @@ def generate_query(document: str, settings: dict) -> list:
 # Configure logging
 # logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+#ga1nang change
 def generate_positive_synthetic_queries(documents: pd.DataFrame, settings: dict, chunk_size: int) -> pd.DataFrame:
     """
     Processes the documents to generate synthetic queries and remove duplicates.
@@ -377,42 +378,53 @@ def generate_positive_synthetic_queries(documents: pd.DataFrame, settings: dict,
         pd.DataFrame: DataFrame containing the documents with the generated synthetic queries.
     """
     num_documents = len(documents)
-    target_queries = num_documents * 2
-
-    all_queries = []
     initial_queries_per_document = 2
+    target_queries = num_documents * initial_queries_per_document # Targeting at least 2 queries per document
+
+    all_queries = [] # Stores all generated queries
     synthetic_queries_filename = settings.get('synthetic_queries_filename', 'intermediate_queries.tsv')
 
+    # Process documents in chunks (useful if working with large datasets)
     for start in range(0, num_documents, chunk_size):
         end = min(start + chunk_size, num_documents)
         chunk = documents[start:end]
 
+        # Show progress bar while generating queries for the chunk
         with tqdm(total=len(chunk) * initial_queries_per_document, desc=f"Generating positive synthetic queries for documents {start} to {end}...") as pbar:
             for index, row in chunk.iterrows():
                 document = row['document']
                 synthetic_queries = []
                 for _ in range(initial_queries_per_document):
+                    # Call the query generator function
                     synthetic_queries.extend(generate_query(document, settings))
                     pbar.update(1)
+                # Store the index, document, and all generated queries
                 all_queries.append((index, document, synthetic_queries))
 
+        # Flatten the nested list of queries to a row per query
         all_queries_flat = [(index, document, query) for index, document, queries in all_queries for query in queries]
         synthetic_queries_df = pd.DataFrame(all_queries_flat, columns=["document_index", "document", "synthetic_query"])
 
         print(f"Total queries generated before filtering: {len(synthetic_queries_df)}")
 
+        # Filter out short queries (likely noise or errors)
         synthetic_queries_df = synthetic_queries_df[synthetic_queries_df["synthetic_query"].str.len() > 10]
         print(f"Total queries after length filtering: {len(synthetic_queries_df)}")
 
+        # Remove exact duplicate queries
         synthetic_queries_df = synthetic_queries_df.drop_duplicates(subset=['synthetic_query'])
         print(f"Total queries after deduplication: {len(synthetic_queries_df)}")
-
+        
+        # Build an index for filtering
         document_index = generate_index(documents)
+        # Optional filter step to ensure quality or match-specific criteria
         synthetic_queries_df = filter_synthetic_queries(synthetic_queries_df, document_index)
         print(f"Total queries after filtering: {len(synthetic_queries_df)}")
 
+        # If we still don't have enough queries, generate more for under-represented documents
         while len(synthetic_queries_df) < target_queries:
             print(f"Not enough queries. Generating more...")
+            # Find which documents have < 1 valid query
             counts = synthetic_queries_df['document_index'].value_counts()
             documents_needing_more_queries = counts[counts < 1].index.tolist()
 
@@ -425,14 +437,16 @@ def generate_positive_synthetic_queries(documents: pd.DataFrame, settings: dict,
                         pbar.update(1)
                     all_queries.append((index, document, additional_queries))
 
+            # Flatten additional queries
             additional_queries_flat = [(index, document, query) for index, document, queries in additional_queries for query in queries]
             additional_queries_df = pd.DataFrame(additional_queries_flat, columns=["document_index", "document", "synthetic_query"])
-
             print(f"Additional queries generated before filtering: {len(additional_queries_df)}")
 
+            # Filter out too-short queries
             additional_queries_df = additional_queries_df[additional_queries_df["synthetic_query"].str.len() > 10]
             print(f"Additional queries after length filtering: {len(additional_queries_df)}")
 
+            # Combine with previous queries and re-apply filters
             synthetic_queries_df = pd.concat([synthetic_queries_df, additional_queries_df]).drop_duplicates(subset=['synthetic_query'])
             synthetic_queries_df = filter_synthetic_queries(synthetic_queries_df, document_index)
             print(f"Total queries after adding additional queries and filtering: {len(synthetic_queries_df)}")
