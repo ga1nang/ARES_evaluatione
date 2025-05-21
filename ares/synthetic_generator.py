@@ -2,6 +2,7 @@ from .LLM_as_a_Judge_Adaptation.Generate_Synthetic_Queries_and_Answers import (
     load_model,
     load_documents,
     load_documents_from_json_folder,
+    load_pdfs,
     load_few_shot_prompt,
     # generate_contradictory_answers,
     generate_few_shot_prompts,
@@ -95,7 +96,7 @@ def synthetic_generator_config(
                 "Do not return multiple answers, labels, or additional text."
             )
 
-        documents = load_documents_from_json_folder(document_filepath, clean_documents, documents_sampled)
+        documents = load_pdfs(document_filepath)
 
         #ga1nang change
         few_shot_examples, length_of_fewshot_prompt = load_few_shot_prompt(
