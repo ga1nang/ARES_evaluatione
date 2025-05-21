@@ -4,6 +4,7 @@ from .LLM_as_a_Judge_Adaptation.Generate_Synthetic_Queries_and_Answers import (
     load_documents_from_json_folder,
     load_pdfs,
     load_few_shot_prompt,
+    load_few_shot_prompt_from_md,
     # generate_contradictory_answers,
     generate_few_shot_prompts,
     generate_synthetic_queries,
@@ -99,8 +100,8 @@ def synthetic_generator_config(
         documents = load_pdfs(document_filepath)
 
         #ga1nang change
-        few_shot_examples, length_of_fewshot_prompt = load_few_shot_prompt(
-            few_shot_prompt_filename, for_fever_dataset, for_wow_dataset
+        few_shot_examples, length_of_fewshot_prompt = load_few_shot_prompt_from_md(
+            few_shot_prompt_filename
         )
         synthetic_queries_config = {
             'few_shot_examples': few_shot_examples,
