@@ -8,6 +8,7 @@ import pandas as pd
 import torch
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
+from typing import List
 from transformers import (AutoModelForCausalLM, AutoModelForSeq2SeqLM,
                           AutoTokenizer)
 
@@ -236,6 +237,28 @@ def load_documents_from_json_folder(folder_path: str, clean_documents: bool, doc
     df = df.sample(n=documents_sampled)
 
     return df
+
+
+def load_pdfs(files_path: str) -> List[bytes]:
+    """
+    Load all PDF files from a directory and return a list of their byte content.
+    
+    Args:
+        files_path (str): Path to the directory containing PDF files.
+    
+    Returns:
+        List[bytes]: A list where each item is the byte content of a PDF.
+    """
+    docs_data = []
+
+    for file in os.listdir(files_path):
+        if file.lower().endswith(".pdf"):  # ensure it's a PDF
+            pdf_path = os.path.join(files_path, file)
+            with open(pdf_path, "rb") as f:
+                doc_data = f.read()
+            docs_data.append(doc_data)
+        
+    return docs_data
 
 
 def load_few_shot_prompt(few_shot_prompt_filename: str, for_fever_dataset: bool, for_wow_dataset: bool) -> tuple[str, int]:
