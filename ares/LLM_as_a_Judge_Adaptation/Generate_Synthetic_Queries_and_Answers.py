@@ -295,6 +295,13 @@ def load_few_shot_prompt(few_shot_prompt_filename: str, for_fever_dataset: bool,
 
     return few_shot_examples, length_of_fewshot_prompt
 
+def load_few_shot_prompt_from_md(few_shot_prompt_filename: str) -> str:
+    with open(few_shot_prompt_filename, 'r', encoding='utf-8') as file:
+        prompt = file.read()
+
+    prompt += "\nYour generated query\n<Query>"
+    return prompt
+    
 # def generate_contradictory_answers(few_shot_prompt_filename: str, for_fever_dataset: bool, for_wow_dataset: bool) -> str:
 #     """
 #     Generates few-shot examples for contradictory answers based on the provided dataset.
