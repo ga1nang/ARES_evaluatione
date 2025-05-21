@@ -1,5 +1,5 @@
-	Example	Query	Document	Answer	Context_Relevance_Label	Answer_Relevance_Label	Answer_Faithfulness_Label
-0	Example 1	"Could you please evaluate the following patient case and provide a comprehensive diagnostic reasoning pathway using both System 1 (intuitive pattern-recognition) and System 2 (analytical hypothesis testing)?
+	Query	Document	Answer	Context_Relevance_Label	Answer_Relevance_Label	Answer_Faithfulness_Label
+0	"Could you please evaluate the following patient case and provide a comprehensive diagnostic reasoning pathway using both System 1 (intuitive pattern-recognition) and System 2 (analytical hypothesis testing)?
 
 Patient Case
 • Demographics A 20-year-old Sudanese housewife, refugee in northern Uganda
@@ -73,7 +73,7 @@ The instant gestalt—young refugee, sudden high fever, mucosal bleeding, outbre
     • Consider investigational monoclonal antibody therapy if accessible; enrol in EVD treatment protocol per WHO guidelines.
     
     • Psychosocial support for family; safe burial practices if patient succumbs."	[[Yes]]	[[Yes]]	[[Yes]]
-1	Example 2	"Could you please evaluate the following patient case and provide a comprehensive diagnostic reasoning pathway using both System 1 (intuitive pattern-recognition) and System 2 (analytical hypothesis testing)?
+1	"Could you please evaluate the following patient case and provide a comprehensive diagnostic reasoning pathway using both System 1 (intuitive pattern-recognition) and System 2 (analytical hypothesis testing)?
 
 Patient Case
 
@@ -155,7 +155,7 @@ Solitary, chronic, painless ulcer with indurated border on the face of a child w
 • Preventive advice: insecticide-impregnated bed nets, protective clothing for future travel; notify regional health authority for surveillance since CL is reportable in Peru.
 
 • Psychosocial support for potential scarring; consider referral for reconstructive assessment once cured."	[[Yes]]	[[Yes]]	[[Yes]]
-2	Example 3	"Could you please evaluate the following patient case and provide a comprehensive diagnostic reasoning pathway using both System 1 (intuitive pattern-recognition) and System 2 (analytical hypothesis testing)?
+2	"Could you please evaluate the following patient case and provide a comprehensive diagnostic reasoning pathway using both System 1 (intuitive pattern-recognition) and System 2 (analytical hypothesis testing)?
 
 Patient Case
 
@@ -253,7 +253,7 @@ Immediate Management / Public-Health Action
 • Public health: notify national TB program; screen household contacts (especially children) with symptom review and chest X-ray; provide isoniazid preventive therapy where appropriate.
 
 • Counsel family on airborne precautions for pulmonary TB sources, HIV testing, and importance of adherence to prolonged therapy."	[[Yes]]	[[Yes]]	[[Yes]]
-3	Example 4	"Could you please evaluate the following patient case and provide a comprehensive diagnostic reasoning pathway using both System 1 (intuitive pattern-recognition) and System 2 (analytical hypothesis testing)?
+3	"Could you please evaluate the following patient case and provide a comprehensive diagnostic reasoning pathway using both System 1 (intuitive pattern-recognition) and System 2 (analytical hypothesis testing)?
 
 Patient Case
 
@@ -351,7 +351,7 @@ Immediate Management / Public-Health Action
 • Family & community education: importance of bed-nets, timely fever evaluation; report case to district malaria surveillance for cluster detection.
 
 • Consider intermittent preventive treatment for siblings < 5 years and seasonal chemoprevention if implemented locally."	[[Yes]]	[[Yes]]	[[Yes]]
-4	Example 5	"Could you please evaluate the following patient case and provide a comprehensive diagnostic reasoning pathway using both System 1 (intuitive pattern-recognition) and System 2 (analytical hypothesis testing)?
+4	"Could you please evaluate the following patient case and provide a comprehensive diagnostic reasoning pathway using both System 1 (intuitive pattern-recognition) and System 2 (analytical hypothesis testing)?
 
 Patient Case
 
