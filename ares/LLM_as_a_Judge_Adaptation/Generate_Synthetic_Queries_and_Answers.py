@@ -398,26 +398,25 @@ def generate_query(document: bytes, settings: dict) -> list:
         list: List of generated synthetic queries.
     """
 
-    if settings['api_model']:
-        return generate_synthetic_query_gemini_approach( # LLM_Synth_Gen
-            document, 
-            settings["synthetic_query_prompt"], 
-            settings['few_shot_examples'], 
-            settings['model'], 
-            settings['percentiles']
-        )
-    else: 
-        return generate_synthetic_query_llm_approach( # LLM_Generation
+    return generate_synthetic_query_gemini_approach( # LLM_Synth_Gen
         document, 
+        settings["synthetic_query_prompt"], 
         settings['few_shot_examples'], 
-        settings['length_of_fewshot_prompt'], 
-        settings['device'], 
-        settings['tokenizer'], 
-        settings['model'], 
-        settings['percentiles'], 
-        settings['for_fever_dataset'], 
-        settings['for_wow_dataset']
-        )
+        settings['model_name'], 
+        settings['percentiles']
+    )
+    # else: 
+    #     return generate_synthetic_query_llm_approach( # LLM_Generation
+    #     document, 
+    #     settings['few_shot_examples'], 
+    #     settings['length_of_fewshot_prompt'], 
+    #     settings['device'], 
+    #     settings['tokenizer'], 
+    #     settings['model'], 
+    #     settings['percentiles'], 
+    #     settings['for_fever_dataset'], 
+    #     settings['for_wow_dataset']
+    #     )
 
 # import logging
 
