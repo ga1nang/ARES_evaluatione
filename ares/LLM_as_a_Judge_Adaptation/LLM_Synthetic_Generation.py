@@ -1,9 +1,18 @@
 import os
+from google import genai
+from google.genai import types
 
-def generate_synthetic_query_api_approach(document: str, synthetic_query_prompt: str, prompt: str, length_of_fewshot_prompt: int, 
-                                          model_name: str, percentiles: list, 
-                                          for_fever_dataset=False, for_wow_dataset=False,
-                                          num_queries: int = 3) -> list:
+def generate_synthetic_query_api_approach(
+    document: str, 
+    synthetic_query_prompt: str, 
+    few_shot_prompt: str, 
+    length_of_fewshot_prompt: int, 
+    model_name: str, 
+    percentiles: list, 
+    for_fever_dataset=False, 
+    for_wow_dataset=False,
+    num_queries: int = 3
+) -> list:
     """
     Generates synthetic queries based on a document using an API model.
 
@@ -27,7 +36,7 @@ def generate_synthetic_query_api_approach(document: str, synthetic_query_prompt:
     synthetic_queries = []
 
     # Construct the prompt without the document based on the dataset type
-    prompt_without_document = prompt + "Example " + str(length_of_fewshot_prompt + 1) + ":\n"
+    prompt_without_document = few_shot_prompt + "Example " + str(length_of_fewshot_prompt + 1) + ":\n"
     prompt_without_document += "Document:"
 
     # Calculate the length of tokens for the prompt and document
@@ -84,199 +93,15 @@ def generate_synthetic_query_api_approach(document: str, synthetic_query_prompt:
 
     return synthetic_queries
 
-def generate_synthetic_answer_api_approach(document: str, question: str, synthetic_answer_prompt: str, prompt: str, 
-                                           length_of_fewshot_prompt: int, model_name: str, for_fever_dataset=False, 
-                                           for_wow_dataset=False): 
-    # Construct the prompt without the document based on the dataset type
-    prompt_without_document = prompt + "Example " + str(length_of_fewshot_prompt + 1) + ":\n"
-    if for_fever_dataset:
-        prompt_without_document += "Document: \nStatement: \nAnswer: "
-    elif for_wow_dataset:
-        prompt_without_document += "Document: \nDialogue: \nResponse: "
-    else:
-        prompt_without_document += "Document: \nQuestion: \nAnswer: "
-
-    prompt_tokens_length = len(prompt_without_document)
-    document_length = len(document)
-    question_length = len(question)
-
-    if prompt_tokens_length + document_length + question_length + 100 >= 4096:
-        truncated_document = document[:4096 - prompt_tokens_length - question_length - 100]
-        prompt = prompt_without_document + truncated_document
-    else: 
-        prompt = prompt_without_document + document 
-    
-    prompt += "Example" + str(length_of_fewshot_prompt + 1) + ":\n"
-    prompt += "Document: " + document + "\n"
-    if for_fever_dataset:
-        prompt += "Statement: " + question + "\n"
-        prompt += "Answer: "
-    elif for_wow_dataset:
-        prompt += "Dialogue: " + question + "\n"
-        prompt += "Response: "
-    else:
-        prompt += "Question: " + question + "\n"
-        prompt += "Answer: "
-
-    TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
-
-    client = Together(api_key=TOGETHER_API_KEY)
-    
-    for attempt in range(5):
-        try:
-            chat_completion = client.chat.completions.create(
-                messages=[
-                {"role": "system", "content": synthetic_answer_prompt},
-                {"role": "user", "content": prompt},
-            ],
-            model=model_name,
-            stream=False
-        )
-            # responses = []
-            
-            # for chunk in chat_completion:
-            #     responses.append(chunk.choices[0].delta.content)
-
-            # final_response = " ".join(responses)
-
-            final_response = chat_completion.choices[0].message.content
-            
-            return final_response
-        except Exception as e:
-            print(f"Error generating synthetic queries: {e}")
-            continue
-
-def generate_synthetic_answer_azure_approach(document: str, question: str, synthetic_answer_prompt: str, prompt: str, 
-                                           length_of_fewshot_prompt: int, azure_openai_config: dict, for_fever_dataset=False, 
-                                           for_wow_dataset=False): 
-    # Construct the prompt without the document based on the dataset type
-    prompt_without_document = prompt + "Example " + str(length_of_fewshot_prompt + 1) + ":\n"
-    if for_fever_dataset:
-        prompt_without_document += "Document: \nStatement: \nAnswer: "
-    elif for_wow_dataset:
-        prompt_without_document += "Document: \nDialogue: \nResponse: "
-    else:
-        prompt_without_document += "Document: \nQuestion: \nAnswer: "
-
-    prompt_tokens_length = len(prompt_without_document)
-    document_length = len(document)
-    question_length = len(question)
-
-    if prompt_tokens_length + document_length + question_length + 100 >= 4096:
-        truncated_document = document[:4096 - prompt_tokens_length - question_length - 100]
-        prompt = prompt_without_document + truncated_document
-    else: 
-        prompt = prompt_without_document + document 
-    
-    prompt += "Example" + str(length_of_fewshot_prompt + 1) + ":\n"
-    prompt += "Document: " + document + "\n"
-    if for_fever_dataset:
-        prompt += "Statement: " + question + "\n"
-        prompt += "Answer: "
-    elif for_wow_dataset:
-        prompt += "Dialogue: " + question + "\n"
-        prompt += "Response: "
-    else:
-        prompt += "Question: " + question + "\n"
-        prompt += "Answer: "
-
-    # Setup the Azure OpenAI Model
-    client = AzureOpenAI(
-        api_key=azure_openai_config["api_key"],  
-        api_version=azure_openai_config["model_version"],
-        azure_endpoint = azure_openai_config["api_base"],
-    )
-    
-    for attempt in range(5):
-        try:
-            chat_completion = client.chat.completions.create(
-                messages=[
-                    {"role": "system", "content": synthetic_answer_prompt},
-                    {"role": "user", "content": prompt},
-                ],
-                model=azure_openai_config["deployment_name"],
-                stream=False
-            )
-            # responses = []
-            
-            # for chunk in chat_completion:
-            #     responses.append(chunk.choices[0].delta.content)
-
-            # final_response = " ".join(responses)
-
-            final_response = chat_completion.choices[0].message.content
-            
-            return final_response
-        except Exception as e:
-            print(f"Error generating synthetic queries: {e}")
-            continue
-
-def generate_synthetic_answer_vllm_approach(document: str, question: str, synthetic_answer_prompt: str, prompt: str, 
-                                           length_of_fewshot_prompt: int, model_name: str, host_url: str, for_fever_dataset=False, 
-                                           for_wow_dataset=False): 
-    # Construct the prompt without the document based on the dataset type
-    prompt_without_document = prompt + "Example " + str(length_of_fewshot_prompt + 1) + ":\n"
-    if for_fever_dataset:
-        prompt_without_document += "Document: \nStatement: \nAnswer: "
-    elif for_wow_dataset:
-        prompt_without_document += "Document: \nDialogue: \nResponse: "
-    else:
-        prompt_without_document += "Document: \nQuestion: \nAnswer: "
-
-    prompt_tokens_length = len(prompt_without_document)
-    document_length = len(document)
-    question_length = len(question)
-
-    if prompt_tokens_length + document_length + question_length + 100 >= 4096:
-        truncated_document = document[:4096 - prompt_tokens_length - question_length - 100]
-        prompt = prompt_without_document + truncated_document
-    else: 
-        prompt = prompt_without_document + document 
-    
-    prompt += "Example" + str(length_of_fewshot_prompt + 1) + ":\n"
-    prompt += "Document: " + document + "\n"
-    if for_fever_dataset:
-        prompt += "Statement: " + question + "\n"
-        prompt += "Answer: "
-    elif for_wow_dataset:
-        prompt += "Dialogue: " + question + "\n"
-        prompt += "Response: "
-    else:
-        prompt += "Question: " + question + "\n"
-        prompt += "Answer: "
-
-    openai_api_key = "EMPTY"
-    client = OpenAI(
-        api_key=openai_api_key,
-        base_url=host_url
-    )
-    
-    for attempt in range(5):
-        try:
-            chat_completion = client.chat.completions.create(
-                messages=[
-                {"role": "system", "content": synthetic_answer_prompt},
-                {"role": "user", "content": prompt},
-            ],
-            model=model_name,
-            stream=False
-        )
-            # responses = []
-            
-            # for chunk in chat_completion:
-            #     responses.append(chunk.choices[0].delta.content)
-
-            # final_response = " ".join(responses)
-
-            final_response = chat_completion.choices[0].message.content
-            
-            return final_response
-        except Exception as e:
-            print(f"Error generating synthetic queries: {e}")
-            continue
-
-def generate_synthetic_contradictory_answers_api_approach(document: str, question: str, synthetic_contradictory_answer_prompt: str, fewshot_examples: str, 
-                                           model_name: str, for_fever_dataset=False, for_wow_dataset=False) -> str:
+def generate_synthetic_contradictory_answers_api_approach(
+    document: str, 
+    question: str, 
+    synthetic_contradictory_answer_prompt: str, 
+    fewshot_examples: str, 
+    model_name: str, 
+    for_fever_dataset=False, 
+    for_wow_dataset=False
+) -> str:
     """
     Generates a synthetic contradictory answer using an API-based approach based on the provided document and question.
 
@@ -356,3 +181,68 @@ def generate_synthetic_contradictory_answers_api_approach(document: str, questio
         except Exception as e:
             print(f"Error generating synthetic contradictory answer: {e}")
             continue
+
+def generate_synthetic_query_gemini_approach(
+    doc_data: bytes,  # PDF file content in bytes
+    synthetic_query_prompt: str,
+    few_shot_prompt: str,
+    model_name: str,
+    percentiles: list,
+    num_queries: int = 3
+) -> list:
+    """
+    Generates synthetic queries from a PDF (bytes) using Gemini API.
+
+    Args:
+        doc_data (bytes): The PDF document content in bytes.
+        synthetic_query_prompt (str): System instruction for Gemini.
+        prompt (str): User prompt.
+        model_name (str): Gemini model name (e.g. "gemini-1.5-flash").
+        percentiles (list): Temperature values to control generation.
+        num_queries (int): Number of queries to generate per document.
+
+    Returns:
+        list: Generated synthetic queries.
+    """
+    synthetic_queries = []
+
+    # Load Gemini API key from env
+    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+    few_shot_prompt += "\nYour generated query\n<Query>"
+
+    for _ in range(num_queries):
+        for percentile in percentiles:
+            success = False
+            # Allows retrying failed attempts (up to 5)
+            # This pattern is standard for robust error handling,
+            # especially in remote API calls where network failures, rate limits,
+            # or timeouts may occur.
+            for attempt in range(5):
+                try:
+                    response = client.models.generate_content(
+                        model=model_name,
+                        config=types.GenerateContentConfig(
+                            system_instruction=synthetic_query_prompt,
+                            temperature=percentile
+                        ),
+                        contents=[
+                            types.Part.from_bytes(
+                                data=doc_data,
+                                mime_type="application/pdf"
+                            ),
+                            few_shot_prompt
+                        ]
+                    )
+                    synthetic_queries.append(response.text)
+                    success = True
+                    break # Exit retry loop if successful
+                except Exception as e:
+                    print(f"[Gemini] Error at percentile {percentile}: {e}")
+
+            if not success:
+                print(f"[Gemini] Failed after 5 attempts for percentile {percentile}")
+
+    return synthetic_queries
+
+    
+    
