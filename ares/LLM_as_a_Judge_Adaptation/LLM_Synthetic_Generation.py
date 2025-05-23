@@ -219,7 +219,7 @@ def generate_synthetic_query_gemini_approach(
                         ),
                         contents=[
                             Part.from_bytes(data=doc_data, mime_type="application/pdf"),
-                            Part.from_text(full_prompt)
+                            full_prompt
                         ]
                     )
 
