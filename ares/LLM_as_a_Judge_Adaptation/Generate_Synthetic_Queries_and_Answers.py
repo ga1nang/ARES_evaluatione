@@ -6,6 +6,8 @@ import os
 import numpy as np
 import pandas as pd
 import torch
+from dotenv import load_dotenv
+from google import genai
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 from typing import List
@@ -386,7 +388,7 @@ def generate_few_shot_prompts(few_shot_prompt_filename: str, for_fever_dataset: 
     
     return answer_gen_few_shot_examples, length_of_fewshot_prompt_answer_gen
 
-def generate_query(document: bytes, settings: dict) -> list:
+def generate_query(document: bytes, settings: dict, client) -> list:
     """
     Generates synthetic queries for a given document.
 
@@ -403,7 +405,8 @@ def generate_query(document: bytes, settings: dict) -> list:
         settings["synthetic_query_prompt"], 
         settings['few_shot_examples'], 
         settings['model_name'], 
-        settings['percentiles']
+        settings['percentiles'],
+        client=client
     )
     # else: 
     #     return generate_synthetic_query_llm_approach( # LLM_Generation
@@ -531,12 +534,16 @@ def generate_positive_synthetic_queries(documents: list, settings: dict) -> pd.D
     synthetic_queries_filename = settings.get('synthetic_queries_filename', 'intermediate_queries.tsv')
 
     all_queries = []
+    
+    #load model
+    load_dotenv()
+    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
     with tqdm(total=len(documents) * initial_queries_per_document, desc="Generating positive synthetic queries") as pbar:
         for doc_index, doc_bytes in enumerate(documents):
             for _ in range(initial_queries_per_document):
                 try:
-                    queries = generate_query(doc_bytes, settings)  # Must return list of strings
+                    queries = generate_query(doc_bytes, settings, client)  # Must return list of strings
                     for query in queries:
                         all_queries.append({
                             "document_index": doc_index,

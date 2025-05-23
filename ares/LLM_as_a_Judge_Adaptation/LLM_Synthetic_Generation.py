@@ -1,7 +1,7 @@
 import os
-from dotenv import load_dotenv
-from google import genai
-from google.genai import types
+from google.genai.types import GenerateContentConfig, Part
+from typing import Any
+
 
 def generate_synthetic_query_api_approach(
     document: str, 
@@ -184,11 +184,12 @@ def generate_synthetic_contradictory_answers_api_approach(
             continue
 
 def generate_synthetic_query_gemini_approach(
-    doc_data: bytes,  # PDF file content in bytes
+    doc_data: bytes,
     synthetic_query_prompt: str,
     few_shot_prompt: str,
     model_name: str,
     percentiles: list,
+    client: Any,                  # ← moved before num_queries
     num_queries: int = 3
 ) -> list:
     """
@@ -201,15 +202,13 @@ def generate_synthetic_query_gemini_approach(
         model_name (str): Gemini model name (e.g. "gemini-1.5-flash").
         percentiles (list): Temperature values to control generation.
         num_queries (int): Number of queries to generate per document.
+        client (Any): gemini model
 
     Returns:
         list: Generated synthetic queries.
     """
     synthetic_queries = []
 
-    # Load Gemini API key from env
-    load_dotenv()
-    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
     few_shot_prompt += "\nYour generated query\n<Query>"
 
     for _ in range(num_queries):
@@ -223,12 +222,12 @@ def generate_synthetic_query_gemini_approach(
                 try:
                     response = client.models.generate_content(
                         model=model_name,
-                        config=types.GenerateContentConfig(
+                        config=GenerateContentConfig(
                             system_instruction=synthetic_query_prompt,
                             temperature=percentile
                         ),
                         contents=[
-                            types.Part.from_bytes(
+                            Part.from_bytes(
                                 data=doc_data,
                                 mime_type="application/pdf"
                             ),
