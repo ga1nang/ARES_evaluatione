@@ -22,8 +22,7 @@ from ares.LLM_as_a_Judge_Adaptation.LLM_Generation_Functions import (check_gener
                                                                       )
 
 from ares.LLM_as_a_Judge_Adaptation.LLM_Synthetic_Generation import (generate_synthetic_query_api_approach,
-                                                                    generate_synthetic_answer_api_approach,
-                                                                    generate_synthetic_answer_azure_approach)
+                                                                    generate_synthetic_query_gemini_approach)
 
 
 import os
@@ -387,7 +386,7 @@ def generate_few_shot_prompts(few_shot_prompt_filename: str, for_fever_dataset: 
     
     return answer_gen_few_shot_examples, length_of_fewshot_prompt_answer_gen
 
-def generate_query(document: str, settings: dict) -> list:
+def generate_query(document: bytes, settings: dict) -> list:
     """
     Generates synthetic queries for a given document.
 
@@ -400,15 +399,12 @@ def generate_query(document: str, settings: dict) -> list:
     """
 
     if settings['api_model']:
-        return generate_synthetic_query_api_approach( # LLM_Synth_Gen
+        return generate_synthetic_query_gemini_approach( # LLM_Synth_Gen
             document, 
             settings["synthetic_query_prompt"], 
             settings['few_shot_examples'], 
-            settings['length_of_fewshot_prompt'], 
             settings['model'], 
-            settings['percentiles'], 
-            settings['for_fever_dataset'], 
-            settings['for_wow_dataset']
+            settings['percentiles']
         )
     else: 
         return generate_synthetic_query_llm_approach( # LLM_Generation
@@ -596,9 +592,9 @@ def generate_synthetic_queries(documents: pd.DataFrame, settings: dict) -> pd.Da
     if num_documents % 2 != 0:
         half_num_documents += 1
     
-    # Split documents into two halves (not used later but possibly for ablation or debugging)
-    first_half_documents = documents.head(half_num_documents)
-    second_half_documents = documents.tail(num_documents - half_num_documents)
+    # # Split documents into two halves (not used later but possibly for ablation or debugging)
+    # first_half_documents = documents.head(half_num_documents)
+    # second_half_documents = documents.tail(num_documents - half_num_documents)
     
      # Step 1: Generate initial set of positive synthetic queries
     print(f"Generating positive queries for all {len(documents)} documents...")

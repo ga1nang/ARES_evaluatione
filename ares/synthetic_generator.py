@@ -100,12 +100,11 @@ def synthetic_generator_config(
         documents = load_pdfs(document_filepath)
 
         #ga1nang change
-        few_shot_examples, length_of_fewshot_prompt = load_few_shot_prompt_from_md(
+        few_shot_examples = load_few_shot_prompt_from_md(
             few_shot_prompt_filename
         )
         synthetic_queries_config = {
             'few_shot_examples': few_shot_examples,
-            'length_of_fewshot_prompt': length_of_fewshot_prompt,
             'device': device,
             'tokenizer': tokenizer,
             'model': model,
@@ -122,16 +121,17 @@ def synthetic_generator_config(
             'number_of_negatives_added_ratio': number_of_negatives_added_ratio,
             'lower_bound_for_negatives': lower_bound_for_negatives
         }
-
+        
         generate_synthetic_queries(documents, synthetic_queries_config)
         # few_shot_examples_for_contradictory_answers = generate_contradictory_answers(
         #     few_shot_prompt_filename, for_fever_dataset, for_wow_dataset
         # )
         #ga1nang change
+        """
         answer_gen_few_shot_examples, length_of_fewshot_prompt_answer_gen = generate_few_shot_prompts(
             few_shot_prompt_filename, for_fever_dataset, for_wow_dataset
         )
-
+        
         synthetic_answers_config = {
             'regenerate_answers': regenerate_answers,
             'answer_gen_few_shot_examples': answer_gen_few_shot_examples,
@@ -154,3 +154,4 @@ def synthetic_generator_config(
         }
 
         generate_synthetic_answers(synthetic_queries_filename, synthetic_answers_config)
+        """
