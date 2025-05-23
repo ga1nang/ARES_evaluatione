@@ -1,4 +1,5 @@
 import os
+from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
@@ -207,6 +208,7 @@ def generate_synthetic_query_gemini_approach(
     synthetic_queries = []
 
     # Load Gemini API key from env
+    load_dotenv()
     client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
     few_shot_prompt += "\nYour generated query\n<Query>"
 

@@ -22,6 +22,7 @@ def synthetic_generator_config(
     vllm: bool = False,
     host_url: str = "http://0.0.0.0:8000/v1",
     api_model: bool = False,
+    model_name: str = "gemini-1.5-flash",
     clean_documents: bool = False,
     regenerate_synth_questions: bool = True, 
     percentiles: list = [0.05, 0.25, 0.5, 0.95], 
@@ -96,7 +97,7 @@ def synthetic_generator_config(
                 "Answer with either 'SUPPORTS' or 'REFUTES' based on the content of the document.  Return only one correct answer."
                 "Do not return multiple answers, labels, or additional text."
             )
-
+        
         documents = load_pdfs(document_filepath)
 
         #ga1nang change
@@ -111,6 +112,7 @@ def synthetic_generator_config(
             "vllm": vllm,
             "host_url": host_url,
             'api_model': api_model,
+            'model_name': 'gemini-1.5-flash',
             'model_choice': model_choice,
             'percentiles': percentiles,
             'for_fever_dataset': for_fever_dataset,
@@ -123,6 +125,7 @@ def synthetic_generator_config(
         }
         
         generate_synthetic_queries(documents, synthetic_queries_config)
+        
         # few_shot_examples_for_contradictory_answers = generate_contradictory_answers(
         #     few_shot_prompt_filename, for_fever_dataset, for_wow_dataset
         # )
