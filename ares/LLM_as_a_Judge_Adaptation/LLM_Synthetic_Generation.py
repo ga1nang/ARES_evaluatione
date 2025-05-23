@@ -1,4 +1,5 @@
 import os
+import time
 from google.genai.types import GenerateContentConfig, Part
 from typing import Any
 
@@ -189,37 +190,27 @@ def generate_synthetic_query_gemini_approach(
     few_shot_prompt: str,
     model_name: str,
     percentiles: list,
-    client: Any,                  # ← moved before num_queries
-    num_queries: int = 3
+    num_queries: int = 3,
+    client=None
 ) -> list:
-    """
-    Generates synthetic queries from a PDF (bytes) using Gemini API.
-
-    Args:
-        doc_data (bytes): The PDF document content in bytes.
-        synthetic_query_prompt (str): System instruction for Gemini.
-        prompt (str): User prompt.
-        model_name (str): Gemini model name (e.g. "gemini-1.5-flash").
-        percentiles (list): Temperature values to control generation.
-        num_queries (int): Number of queries to generate per document.
-        client (Any): gemini model
-
-    Returns:
-        list: Generated synthetic queries.
-    """
     synthetic_queries = []
+    full_prompt = few_shot_prompt.strip() + "\nYour generated query\n<Query>"
 
-    few_shot_prompt += "\nYour generated query\n<Query>"
+    request_counter = 0  # Count requests this session
+    max_requests_per_minute = 14  # Be conservative to avoid 429s
+    minute_window = 60            # Time to wait between batches
 
     for _ in range(num_queries):
         for percentile in percentiles:
             success = False
-            # Allows retrying failed attempts (up to 5)
-            # This pattern is standard for robust error handling,
-            # especially in remote API calls where network failures, rate limits,
-            # or timeouts may occur.
             for attempt in range(5):
                 try:
+                    # Rate limiting logic
+                    if request_counter >= max_requests_per_minute:
+                        print("[Gemini] Throttling to avoid hitting free tier limits...")
+                        time.sleep(minute_window)
+                        request_counter = 0
+
                     response = client.models.generate_content(
                         model=model_name,
                         config=GenerateContentConfig(
@@ -227,18 +218,25 @@ def generate_synthetic_query_gemini_approach(
                             temperature=percentile
                         ),
                         contents=[
-                            Part.from_bytes(
-                                data=doc_data,
-                                mime_type="application/pdf"
-                            ),
-                            few_shot_prompt
+                            Part.from_bytes(data=doc_data, mime_type="application/pdf"),
+                            Part.from_text(full_prompt)
                         ]
                     )
-                    synthetic_queries.append(response.text)
+
+                    synthetic_queries.append(response.text.strip())
                     success = True
-                    break # Exit retry loop if successful
+                    request_counter += 1
+                    break
+
                 except Exception as e:
-                    print(f"[Gemini] Error at percentile {percentile}: {e}")
+                    print(f"[Gemini] Error at percentile {percentile} (attempt {attempt + 1}): {e}")
+                    # Optional: if 429, back off longer
+                    if "429" in str(e) or "rate limit" in str(e).lower():
+                        print("[Gemini] Detected rate limiting, sleeping 60s...")
+                        time.sleep(60)
+
+                # Short wait before retrying
+                time.sleep(2)
 
             if not success:
                 print(f"[Gemini] Failed after 5 attempts for percentile {percentile}")
