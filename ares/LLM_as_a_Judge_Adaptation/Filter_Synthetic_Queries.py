@@ -5,6 +5,9 @@ import numpy as np
 import pandas as pd
 from datasets import Dataset
 from pandas.errors import SettingWithCopyWarning
+from sentence_transformers import SentenceTransformer
+from PyPDF2 import PdfReader
+from io import BytesIO
 from tqdm import tqdm
 
 # def get_embedding(text: str, model: str = "text-embedding-ada-002") -> list:
@@ -35,37 +38,89 @@ from tqdm import tqdm
 #             print(f"Error generating embedding: {e}. Attempting again...")
 #             time.sleep(30)
 
-def generate_index(dataframe: pd.DataFrame) -> Dataset:
-    """
-    Generates an index for the given dataframe by creating embeddings for each document and adding a FAISS index.
+# def generate_index(dataframe: pd.DataFrame) -> Dataset:
+#     """
+#     Generates an index for the given dataframe by creating embeddings for each document and adding a FAISS index.
 
-    Parameters:
-    dataframe (pd.DataFrame): The input dataframe containing documents to be indexed.
+#     Parameters:
+#     dataframe (pd.DataFrame): The input dataframe containing documents to be indexed.
+
+#     Returns:
+#     Dataset: A Hugging Face Dataset object with FAISS index added.
+#     """
+#     # Ignore SettingWithCopyWarning warnings
+#     warnings.simplefilter("ignore", SettingWithCopyWarning)
+    
+#     # Drop duplicate documents
+#     dataframe = dataframe.drop_duplicates(subset="document")
+    
+#     # Initialize tqdm progress bar for generating embeddings
+#     tqdm.pandas(desc="Generating embeddings...", total=dataframe.shape[0])
+    
+#     # Generate embeddings for each document
+#     dataframe['embeddings'] = dataframe["document"].progress_apply(lambda x: get_embedding(x, model='text-embedding-ada-002'))
+    
+#     # Filter out rows where the embedding length is not 1536
+#     dataframe = dataframe[dataframe['embeddings'].apply(lambda x: len(x)) == 1536]
+    
+#     # Convert dataframe to Hugging Face Dataset
+#     dataset = Dataset.from_pandas(dataframe)
+    
+#     # Add FAISS index to the dataset
+#     dataset.add_faiss_index(column="embeddings")
+    
+#     return dataset
+
+# Extract text from PDF bytes
+def extract_text_from_pdf_bytes(pdf_bytes: bytes) -> str:
+    try:
+        reader = PdfReader(BytesIO(pdf_bytes))
+        return "\n".join([page.extract_text() for page in reader.pages if page.extract_text()])
+    except Exception as e:
+        print(f"[Error] Failed to extract text: {e}")
+        return ""
+
+# Generate embedding using SentenceTransformer
+def get_embedding(text: str, embedding_model) -> list:
+    return embedding_model.encode(text, show_progress_bar=False).tolist()
+
+# Final generate_index function
+def generate_index(documents: list) -> Dataset:
+    """
+    Generates a FAISS index from a list of PDF documents in byte format.
+
+    Args:
+        documents (list): List of PDF files as bytes.
 
     Returns:
-    Dataset: A Hugging Face Dataset object with FAISS index added.
+        Dataset: Hugging Face Dataset with FAISS index on 'embeddings'.
     """
-    # Ignore SettingWithCopyWarning warnings
     warnings.simplefilter("ignore", SettingWithCopyWarning)
-    
-    # Drop duplicate documents
-    dataframe = dataframe.drop_duplicates(subset="document")
-    
-    # Initialize tqdm progress bar for generating embeddings
-    tqdm.pandas(desc="Generating embeddings...", total=dataframe.shape[0])
-    
-    # Generate embeddings for each document
-    dataframe['embeddings'] = dataframe["document"].progress_apply(lambda x: get_embedding(x, model='text-embedding-ada-002'))
-    
-    # Filter out rows where the embedding length is not 1536
-    dataframe = dataframe[dataframe['embeddings'].apply(lambda x: len(x)) == 1536]
-    
-    # Convert dataframe to Hugging Face Dataset
-    dataset = Dataset.from_pandas(dataframe)
-    
-    # Add FAISS index to the dataset
+
+    # Load embedding model (clinical + semantic)
+    embedding_model = SentenceTransformer('pritamdeka/BioBERT-mnli-snli-scinli-scitail-mednli-stsb')
+
+    processed = []
+    print("Extracting text and generating embeddings...")
+    for idx, pdf_bytes in enumerate(tqdm(documents)):
+        text = extract_text_from_pdf_bytes(pdf_bytes)
+        if not text or len(text.strip()) < 10:
+            continue
+        embedding = get_embedding(text, embedding_model)
+        processed.append({
+            "doc_index": idx,
+            "document": text,
+            "embeddings": embedding
+        })
+
+    df = pd.DataFrame(processed)
+
+    # Optional filter by length (depends on model, update as needed)
+    df = df[df['embeddings'].apply(lambda x: len(x) == len(df.iloc[0]['embeddings']))]
+
+    dataset = Dataset.from_pandas(df)
     dataset.add_faiss_index(column="embeddings")
-    
+
     return dataset
 
 def filter_synthetic_queries(queries_dataset: pd.DataFrame, document_index) -> pd.DataFrame:
