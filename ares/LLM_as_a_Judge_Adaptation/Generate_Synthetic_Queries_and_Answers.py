@@ -828,22 +828,7 @@ def generate_answers(synthetic_queries: pd.DataFrame, answer_generation_settings
     Returns:
         pd.DataFrame: DataFrame containing the synthetic queries with generated answers.
     """
-    if answer_generation_settings['azure_openai_config'] == True:
-        tqdm.pandas(desc=f"Generating answers... (Azure OpenAI Model)", total=synthetic_queries.shape[0])
-        synthetic_queries["generated_answer"] = synthetic_queries.progress_apply(
-            lambda x: generate_synthetic_answer_azure_approach(
-                x["document"], 
-                x["synthetic_query"], 
-                answer_generation_settings['synthetic_valid_answer_prompt'], 
-                answer_generation_settings['answer_gen_few_shot_examples'], 
-                answer_generation_settings['length_of_fewshot_prompt_answer_gen'], 
-                answer_generation_settings['azure_openai_config'],
-                answer_generation_settings['for_fever_dataset'], 
-                answer_generation_settings['for_wow_dataset']
-            ), 
-            axis=1
-        )
-    elif answer_generation_settings['api_model']:
+    if answer_generation_settings['api_model']:
         tqdm.pandas(desc=f"Generating answers... ({answer_generation_settings['model']})", total=synthetic_queries.shape[0])
         synthetic_queries["generated_answer"] = synthetic_queries.progress_apply(
             lambda x: generate_synthetic_answer_api_approach(
@@ -853,23 +838,6 @@ def generate_answers(synthetic_queries: pd.DataFrame, answer_generation_settings
                 answer_generation_settings['answer_gen_few_shot_examples'], 
                 answer_generation_settings['length_of_fewshot_prompt_answer_gen'], 
                 answer_generation_settings['model'],  
-                answer_generation_settings['for_fever_dataset'], 
-                answer_generation_settings['for_wow_dataset']
-            ), 
-            axis=1
-        )
-    elif answer_generation_settings['vllm']:
-        tqdm.pandas(desc=f"Generating answers... (VLLM - {answer_generation_settings['model']})", total=synthetic_queries.shape[0])
-        synthetic_queries["generated_answer"] = synthetic_queries.progress_apply(
-            lambda x: generate_synthetic_answer_vllm_approach(
-                x["document"], 
-                x["synthetic_query"], 
-                answer_generation_settings['synthetic_valid_answer_prompt'], 
-                answer_generation_settings['answer_gen_few_shot_examples'], 
-                answer_generation_settings['length_of_fewshot_prompt_answer_gen'], 
-                answer_generation_settings['tokenizer'],
-                answer_generation_settings['model'], 
-                answer_generation_settings['host_url'], 
                 answer_generation_settings['for_fever_dataset'], 
                 answer_generation_settings['for_wow_dataset']
             ), 
