@@ -259,6 +259,9 @@ def load_pdfs(files_path: str) -> List[bytes]:
                 doc_data = f.read()
             docs_data.append(doc_data)
         
+        # load 1 doc for testing
+        break
+        
     return docs_data
 
 
