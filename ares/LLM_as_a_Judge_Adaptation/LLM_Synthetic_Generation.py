@@ -1,7 +1,6 @@
 import os
 import time
 from google.genai.types import GenerateContentConfig, Part
-from typing import Any
 
 
 def generate_synthetic_query_api_approach(
@@ -243,5 +242,69 @@ def generate_synthetic_query_gemini_approach(
 
     return synthetic_queries
 
+def generate_synthetic_answer_gemini_approach(
+    doc_data: bytes,
+    question: str, 
+    synthetic_valid_answer_prompt: str, 
+    answer_gen_few_shot_examples: str, 
+    model_name: str, 
+    client=None
+):
+    """
+    Generates a synthetic answer using the Gemini API given a document and a question.
     
-    
+    Args:
+        doc_data (bytes): The content of a single PDF file, loaded as bytes.
+        question (str): A natural language question to be answered based on the document.
+        synthetic_valid_answer_prompt (str): A system-level instruction to guide the model’s behavior.
+        answer_gen_few_shot_examples (str): Few-shot examples to prepend to the prompt for better generation.
+        model_name (str): The name of the Gemini model to use (e.g., 'gemini-1.5-flash').
+        client (optional): The instantiated `genai.Client()` object connected to the Gemini API.
+
+    Returns:
+        str: The generated answer text from the model.
+
+    Raises:
+        RuntimeError: If all retry attempts fail to return a successful result.
+    """
+    # Construct the full prompt
+    full_prompt = answer_gen_few_shot_examples.strip() + "\n"
+    full_prompt += f"<Query> {question}\n</Query>"
+
+    # Rate limiting control
+    request_counter = 0
+    max_requests_per_minute = 14
+    minute_window = 60  # seconds
+
+    success = False
+    for attempt in range(5):
+        try:
+            if request_counter >= max_requests_per_minute:
+                print("[Gemini] Throttling to avoid hitting free tier limits...")
+                time.sleep(minute_window)
+                request_counter = 0
+
+            response = client.models.generate_content(
+                model=model_name,
+                config=GenerateContentConfig(
+                    system_instruction=synthetic_valid_answer_prompt,
+                ),
+                contents=[
+                    Part.from_bytes(data=doc_data, mime_type="application/pdf"),
+                    full_prompt
+                ]
+            )
+
+            success = True
+            request_counter += 1
+            return response.text.strip()
+
+        except Exception as e:
+            print(f"[Gemini] generate answer error at (attempt {attempt + 1}): {e}")
+            if "429" in str(e) or "rate limit" in str(e).lower():
+                print("[Gemini] Detected rate limiting, sleeping 60s...")
+                time.sleep(60)
+            time.sleep(2)
+
+    if not success:
+        raise RuntimeError("[Gemini] Failed to generate answer after 5 attempts.")

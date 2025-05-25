@@ -112,7 +112,7 @@ def synthetic_generator_config(
             "vllm": vllm,
             "host_url": host_url,
             'api_model': api_model,
-            'model_name': 'gemini-1.5-flash',
+            'model_name': model_name,
             'model_choice': model_choice,
             'percentiles': percentiles,
             'for_fever_dataset': for_fever_dataset,
@@ -130,21 +130,20 @@ def synthetic_generator_config(
         #     few_shot_prompt_filename, for_fever_dataset, for_wow_dataset
         # )
         #ga1nang change
-        """
-        answer_gen_few_shot_examples, length_of_fewshot_prompt_answer_gen = generate_few_shot_prompts(
-            few_shot_prompt_filename, for_fever_dataset, for_wow_dataset
-        )
+
+        # answer_gen_few_shot_examples, length_of_fewshot_prompt_answer_gen = generate_few_shot_prompts(
+        #     few_shot_prompt_filename, for_fever_dataset, for_wow_dataset
+        # )
         
         synthetic_answers_config = {
             'regenerate_answers': regenerate_answers,
-            'answer_gen_few_shot_examples': answer_gen_few_shot_examples,
-            'length_of_fewshot_prompt_answer_gen': length_of_fewshot_prompt_answer_gen,
+            'answer_gen_few_shot_examples': few_shot_examples,
             'device': device,
             'tokenizer': tokenizer,
             'api_model': api_model,
             'synthetic_valid_answer_prompt': synthetic_valid_answer_prompt,
             'synthetic_contradictory_answer_prompt': synthetic_contradictory_answer_prompt,
-            'model': model,
+            'model_name': model_name,
             'vllm': vllm,
             'host_url': host_url,
             'for_fever_dataset': for_fever_dataset,
@@ -157,4 +156,4 @@ def synthetic_generator_config(
         }
 
         generate_synthetic_answers(synthetic_queries_filename, synthetic_answers_config)
-        """
+        
