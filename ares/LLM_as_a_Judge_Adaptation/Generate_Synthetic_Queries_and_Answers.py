@@ -24,7 +24,8 @@ from ares.LLM_as_a_Judge_Adaptation.LLM_Generation_Functions import (check_gener
                                                                       )
 
 from ares.LLM_as_a_Judge_Adaptation.LLM_Synthetic_Generation import (generate_synthetic_query_api_approach,
-                                                                    generate_synthetic_query_gemini_approach)
+                                                                    generate_synthetic_query_gemini_approach,
+                                                                    generate_synthetic_answer_gemini_approach)
 
 
 import os
@@ -828,18 +829,20 @@ def generate_answers(synthetic_queries: pd.DataFrame, answer_generation_settings
     Returns:
         pd.DataFrame: DataFrame containing the synthetic queries with generated answers.
     """
+    # Init client of gemini api
+    load_dotenv()
+    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+    # Start to generate synthetic answer
     if answer_generation_settings['api_model']:
         tqdm.pandas(desc=f"Generating answers... ({answer_generation_settings['model']})", total=synthetic_queries.shape[0])
         synthetic_queries["generated_answer"] = synthetic_queries.progress_apply(
-            lambda x: generate_synthetic_answer_api_approach(
+            lambda x: generate_synthetic_answer_gemini_approach(
                 x["document"], 
                 x["synthetic_query"], 
                 answer_generation_settings['synthetic_valid_answer_prompt'], 
                 answer_generation_settings['answer_gen_few_shot_examples'], 
-                answer_generation_settings['length_of_fewshot_prompt_answer_gen'], 
-                answer_generation_settings['model'],  
-                answer_generation_settings['for_fever_dataset'], 
-                answer_generation_settings['for_wow_dataset']
+                answer_generation_settings['model_name'],  
+                client
             ), 
             axis=1
         )
