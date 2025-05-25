@@ -22,7 +22,7 @@ def synthetic_generator_config(
     vllm: bool = False,
     host_url: str = "http://0.0.0.0:8000/v1",
     api_model: bool = False,
-    model_name: str = "gemini-1.5-flash",
+    model_name: str = "gemini-2.0-flash-lite",
     clean_documents: bool = False,
     regenerate_synth_questions: bool = True, 
     percentiles: list = [0.05, 0.25, 0.5, 0.95], 
