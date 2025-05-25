@@ -1,5 +1,6 @@
 import os
 import time
+import ast
 from google.genai.types import GenerateContentConfig, Part
 
 
@@ -275,6 +276,8 @@ def generate_synthetic_answer_gemini_approach(
     request_counter = 0
     max_requests_per_minute = 14
     minute_window = 60  # seconds
+    # turn doc from string of bytes into bytes
+    document_bytes = ast.literal_eval(doc_data) 
 
     success = False
     for attempt in range(5):
@@ -290,7 +293,7 @@ def generate_synthetic_answer_gemini_approach(
                     system_instruction=synthetic_valid_answer_prompt,
                 ),
                 contents=[
-                    Part.from_bytes(data=doc_data, mime_type="application/pdf"),
+                    Part.from_bytes(data=document_bytes, mime_type="application/pdf"),
                     full_prompt
                 ]
             )
