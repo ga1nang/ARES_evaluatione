@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 from datasets import Dataset
 from pandas.errors import SettingWithCopyWarning
-from sentence_transformers import SentenceTransformer
 from PyPDF2 import PdfReader
 from io import BytesIO
 from tqdm import tqdm
@@ -85,7 +84,7 @@ def get_embedding(text: str, embedding_model) -> list:
     return embedding_model.encode(text, show_progress_bar=False).tolist()
 
 # Final generate_index function
-def generate_index(documents: list) -> Dataset:
+def generate_index(documents: list, embedding_model) -> Dataset:
     """
     Generates a FAISS index from a list of PDF documents in byte format.
 
@@ -96,9 +95,6 @@ def generate_index(documents: list) -> Dataset:
         Dataset: Hugging Face Dataset with FAISS index on 'embeddings'.
     """
     warnings.simplefilter("ignore", SettingWithCopyWarning)
-
-    # Load embedding model (clinical + semantic)
-    embedding_model = SentenceTransformer('pritamdeka/BioBERT-mnli-snli-scinli-scitail-mednli-stsb')
 
     processed = []
     print("Extracting text and generating embeddings...")
@@ -123,7 +119,7 @@ def generate_index(documents: list) -> Dataset:
 
     return dataset
 
-def filter_synthetic_queries(queries_dataset: pd.DataFrame, document_index) -> pd.DataFrame:
+def filter_synthetic_queries(queries_dataset: pd.DataFrame, document_index, embedding_model) -> pd.DataFrame:
     """
     Filters synthetic queries based on their relevance to the documents in the document index.
 
@@ -134,53 +130,47 @@ def filter_synthetic_queries(queries_dataset: pd.DataFrame, document_index) -> p
     Returns:
     pd.DataFrame: The updated dataset with a new column 'Context_Relevance_Label' indicating the relevance of each query.
     """
-    
-    total_filtered_questions = []
+    from datasets import Dataset
+    import numpy as np
+    from tqdm import tqdm
+
+    valid_indices = []
     total_labels = []
-    
+
     # Convert the pandas DataFrame to a Hugging Face Dataset
-    queries_dataset = Dataset.from_pandas(queries_dataset)
-    
-    # Iterate over each query in the dataset
-    for i in tqdm(range(len(queries_dataset))):
-        question = queries_dataset[i]["synthetic_query"]
-        embedding = get_embedding(question)
-        
-        # Check if embedding is valid
+    hf_dataset = Dataset.from_pandas(queries_dataset)
+
+    for i in tqdm(range(len(hf_dataset))):
+        question = hf_dataset[i]["synthetic_query"]
+        embedding = get_embedding(question, embedding_model)
+
         if embedding is None or len(embedding) == 0:
             print(f"Warning: No embedding generated for query '{question}'. Skipping.")
             continue
+
         question_embedding = np.array(embedding).astype(np.float32)
-        
-        # Ensure question_embedding is a 2D array with shape (1, 1536)
-        if question_embedding.shape != (1536,):
-            print(f"Warning: Invalid embedding shape {question_embedding.shape} for query '{question}'. Skipping.")
-            continue
+
+        # if question_embedding.shape != (1536,):
+        #     print(f"Warning: Invalid embedding shape {question_embedding.shape} for query '{question}'. Skipping.")
+        #     continue
+
         question_embedding = question_embedding.reshape(1, -1)
-        
-        # Retrieve the nearest examples from the document index
-        scores, samples = document_index.get_nearest_examples("embeddings", question_embedding, k=20)
-        
-        # Check if the top result matches the document in the query dataset
-        if samples["document"][0] == queries_dataset[i]["document"]:
+        scores, samples = document_index.get_nearest_examples("embeddings", question_embedding, k=1)
+
+        # Only record this index if everything checks out
+        valid_indices.append(i)
+
+        if samples["document"][0] == hf_dataset[i]["document"]:
             total_labels.append("Yes")
         else:
-            # Create negatives by filtering out top-k results 
-            found_gold_in_top_k = False
-            for j in range(20):
-                found_gold_in_top_k = found_gold_in_top_k or (samples["document"][j] == queries_dataset[i]["document"])
-            if not found_gold_in_top_k:
-                total_labels.append("No")
-            else:
-                total_labels.append("N/A")
-    
-    # Convert the Hugging Face Dataset back to a pandas DataFrame
-    queries_dataset = queries_dataset.to_pandas()
-    
-    # Add the 'Context_Relevance_Label' column to the DataFrame
-    queries_dataset['Context_Relevance_Label'] = total_labels
+            found_gold_in_top_k = any(samples["document"][j] == hf_dataset[i]["document"] for j in range(1))
+            total_labels.append("N/A" if found_gold_in_top_k else "No")
 
-    return queries_dataset
+    # Only keep rows with valid embeddings
+    filtered_df = queries_dataset.iloc[valid_indices].copy()
+    filtered_df['Context_Relevance_Label'] = total_labels
+
+    return filtered_df
 
 def generate_additional_negatives(queries_dataset: pd.DataFrame, document_index, 
 number_of_negatives_added_ratio: float, lower_bound_for_negatives: int) -> pd.DataFrame:

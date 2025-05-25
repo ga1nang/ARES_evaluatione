@@ -11,6 +11,7 @@ from google import genai
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 from typing import List
+from sentence_transformers import SentenceTransformer
 from transformers import (AutoModelForCausalLM, AutoModelForSeq2SeqLM,
                           AutoTokenizer)
 
@@ -260,8 +261,6 @@ def load_pdfs(files_path: str) -> List[bytes]:
                 doc_data = f.read()
             docs_data.append(doc_data)
         
-        # load 1 doc for testing
-        break
         
     return docs_data
 
@@ -551,7 +550,7 @@ def generate_positive_synthetic_queries(documents: list, settings: dict) -> pd.D
                     for query in queries:
                         all_queries.append({
                             "document_index": doc_index,
-                            "document": f"<PDF {doc_index}>",
+                            "document": doc_bytes,
                             "synthetic_query": query
                         })
                 except Exception as e:
@@ -566,8 +565,9 @@ def generate_positive_synthetic_queries(documents: list, settings: dict) -> pd.D
     print(f"After length + duplicate filtering: {len(df)}")
 
     # Apply filtering based on embedding/index
-    document_index = generate_index(documents)  # Should support list of bytes
-    df = filter_synthetic_queries(df, document_index)
+    embedding_model = SentenceTransformer('pritamdeka/BioBERT-mnli-snli-scinli-scitail-mednli-stsb')
+    document_index = generate_index(documents, embedding_model=embedding_model)  # Should support list of bytes
+    df = filter_synthetic_queries(df, document_index, embedding_model=embedding_model)
     print(f"After filter_synthetic_queries(): {len(df)}")
 
     # Check if we have <1 query per document and fix
@@ -578,11 +578,11 @@ def generate_positive_synthetic_queries(documents: list, settings: dict) -> pd.D
         print("Generating additional queries for underrepresented documents...")
         for index in tqdm(docs_missing, desc="Additional generation"):
             try:
-                more_queries = generate_query(documents[index], settings)
+                more_queries = generate_query(documents[index], settings, client)
                 for query in more_queries:
                     all_queries.append({
                         "document_index": index,
-                        "document": f"<PDF {index}>",
+                        "document": documents[index],
                         "synthetic_query": query
                     })
             except Exception as e:
@@ -591,7 +591,7 @@ def generate_positive_synthetic_queries(documents: list, settings: dict) -> pd.D
         df = pd.DataFrame(all_queries)
         df = df[df["synthetic_query"].str.len() > 10]
         df = df.drop_duplicates(subset=["synthetic_query"])
-        df = filter_synthetic_queries(df, document_index)
+        df = filter_synthetic_queries(df, document_index, embedding_model=embedding_model)
         print(f"Final query count after retries: {len(df)}")
 
     # Save results
@@ -617,11 +617,12 @@ def generate_negative_synthetic_queries(positive_queries_df: pd.DataFrame, docum
     Returns:
         pd.DataFrame: DataFrame containing both positive and negative synthetic queries.
     """
+    documents_df = pd.DataFrame(documents, columns=["document"])
     negative_queries = []
     used_queries = set()
     sampled_queries = positive_queries_df['synthetic_query'].values
 
-    for index, row in documents.iterrows():
+    for index, row in documents_df.iterrows():
         document = row['document']
         negative_query = None
 
@@ -757,19 +758,19 @@ def generate_synthetic_queries(documents: list, settings: dict) -> pd.DataFrame:
     print(f"Generating positive queries for all {num_documents} documents...")
 
     # Step 1: Generate initial positive queries
-    positive_queries = generate_positive_synthetic_queries(documents, settings)
+    positive_queries = generate_positive_synthetic_queries(documents, settings).to_dict(orient="records")
 
     # Step 2: Ensure enough unique queries
     while len(positive_queries) < num_documents * initial_queries_per_document:
         print("Warning: Not enough unique positive queries. Generating more...")
-        more_queries = generate_positive_synthetic_queries(documents, settings)
+        more_queries = generate_positive_synthetic_queries(documents, settings).to_dict(orient="records")
         positive_queries.extend(more_queries)
 
         # Drop duplicates (by document index and synthetic_query string)
         seen = set()
         filtered = []
         for q in positive_queries:
-            key = (q['doc_index'], q['synthetic_query'])
+            key = (q['document_index'], q['synthetic_query'])
             if key not in seen:
                 seen.add(key)
                 filtered.append(q)
@@ -778,7 +779,7 @@ def generate_synthetic_queries(documents: list, settings: dict) -> pd.DataFrame:
     # Step 3: Sample 2 unique positives per document
     by_doc = {}
     for q in positive_queries:
-        by_doc.setdefault(q['doc_index'], []).append(q)
+        by_doc.setdefault(q['document_index'], []).append(q)
 
     set1, set2 = [], []
     for doc_idx, queries in by_doc.items():
@@ -798,8 +799,8 @@ def generate_synthetic_queries(documents: list, settings: dict) -> pd.DataFrame:
 
     # Step 5: Sample 1 negative per document
     by_doc_neg = {}
-    for q in negative_queries:
-        by_doc_neg.setdefault(q['doc_index'], []).append(q)
+    for q in negative_queries.to_dict(orient="records"):
+        by_doc_neg.setdefault(q['document_index'], []).append(q)
     sampled_negatives = [v[0] for v in by_doc_neg.values()]
     for q in sampled_negatives:
         q['Context_Relevance_Label'] = 'No'
@@ -834,7 +835,7 @@ def generate_answers(synthetic_queries: pd.DataFrame, answer_generation_settings
     client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
     # Start to generate synthetic answer
     if answer_generation_settings['api_model']:
-        tqdm.pandas(desc=f"Generating answers... ({answer_generation_settings['model']})", total=synthetic_queries.shape[0])
+        tqdm.pandas(desc=f"Generating answers... ({answer_generation_settings['model_name']})", total=synthetic_queries.shape[0])
         synthetic_queries["generated_answer"] = synthetic_queries.progress_apply(
             lambda x: generate_synthetic_answer_gemini_approach(
                 x["document"], 
