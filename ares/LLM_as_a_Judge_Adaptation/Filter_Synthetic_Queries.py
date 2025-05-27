@@ -155,7 +155,7 @@ def filter_synthetic_queries(queries_dataset: pd.DataFrame, document_index, embe
         #     continue
 
         question_embedding = question_embedding.reshape(1, -1)
-        scores, samples = document_index.get_nearest_examples("embeddings", question_embedding, k=1)
+        scores, samples = document_index.get_nearest_examples("embeddings", question_embedding, k=20)
 
         # Only record this index if everything checks out
         valid_indices.append(i)
@@ -163,7 +163,7 @@ def filter_synthetic_queries(queries_dataset: pd.DataFrame, document_index, embe
         if samples["document"][0] == hf_dataset[i]["document"]:
             total_labels.append("Yes")
         else:
-            found_gold_in_top_k = any(samples["document"][j] == hf_dataset[i]["document"] for j in range(1))
+            found_gold_in_top_k = any(samples["document"][j] == hf_dataset[i]["document"] for j in range(20))
             total_labels.append("N/A" if found_gold_in_top_k else "No")
 
     # Only keep rows with valid embeddings

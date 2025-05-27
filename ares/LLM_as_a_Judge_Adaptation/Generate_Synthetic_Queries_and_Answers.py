@@ -260,7 +260,7 @@ def load_pdfs(files_path: str) -> List[bytes]:
             with open(pdf_path, "rb") as f:
                 doc_data = f.read()
             docs_data.append(doc_data)
-        
+
         
     return docs_data
 
