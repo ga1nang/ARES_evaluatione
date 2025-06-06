@@ -1,6 +1,7 @@
 # test
 test_gemini_api.ipynb
 main.py
+datasets_file/output/synthetic_queries.tsv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
