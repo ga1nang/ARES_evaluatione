@@ -11,6 +11,7 @@ import datetime
 import numpy as np
 import pandas as pd
 import pyarrow as pa
+import mlflow
 
 import torch
 import torch.nn as nn
@@ -336,42 +337,33 @@ def prepare_and_clean_data(params: dict) -> tuple[str, int]:
     assigned_batch_size = params["assigned_batch_size"]
     tokenizer = params["tokenizer"]
 
-    # Log the start of a new learning rate
-    print("--------------------------------------------------------------------------")
-    print("Starting new learning rate: " + str(chosen_learning_rate))
-    print("--------------------------------------------------------------------------")
-
-    # Generate current datetime for checkpoint naming
+    # Generate checkpoint path
+    # In long training jobs, a system crash without a checkpoint mean losing everything.
+    # 
+    # MLflow’s model tracking is great post-training; checkpoints are essential during training.
     current_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-
-    # Define parent directory for checkpoints
     parent_dir = "checkpoints/" + model_choice.replace("/", "-")
-
-    # Create parent directory if it doesn't exist
-    if not os.path.exists(parent_dir):
-        print(f"Creating parent checkpoint directory: {parent_dir}")
-        print("--------------------------------------------------------------------------")
-        os.makedirs(parent_dir)
-
-    # Define the checkpoint path
+    os.makedirs(parent_dir, exist_ok=True)
     checkpoint_path = os.path.join(
-        "checkpoints",
-        model_choice.replace("/", "-"),
+        parent_dir,
         f"{label_column}_{os.path.basename(validation_set).replace('.tsv', '')}_{current_datetime}.pt"
     )
+    
+    # Start MLflow run
+    if mlflow.active_run() is None:
+        mlflow.start_run()
 
-    # Record the start time of execution
-    execution_start = time.time()
-
-    # Log various parameters
-    print("Dataset: " + dataset)
-    print("Model: " + model_choice)
-    print("Test Set Selection: " + validation_set)
-    print('Learning Rate: ' + str(chosen_learning_rate))
-    print("Checkpoint Path: " + checkpoint_path)
-    print("Patience: " + str(patience_value))
-    print("Number of Epochs: " + str(num_epochs))
-    print("--------------------------------------------------------------------------")
+    # Log parameters to MLflow
+    mlflow.log_param("dataset", dataset)
+    mlflow.log_param("model_choice", model_choice)
+    mlflow.log_param("label_column", label_column)
+    mlflow.log_param("validation_set", validation_set)
+    mlflow.log_param("learning_rate", chosen_learning_rate)
+    mlflow.log_param("checkpoint_path", checkpoint_path)
+    mlflow.log_param("patience", patience_value)
+    mlflow.log_param("num_epochs", num_epochs)
+    mlflow.log_param("gradient_accumulation_multiplier", gradient_accumulation_multiplier)
+    mlflow.log_param("assigned_batch_size", assigned_batch_size)
 
     return checkpoint_path, patience_value
 
