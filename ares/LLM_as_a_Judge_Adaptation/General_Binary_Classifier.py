@@ -298,11 +298,9 @@ def load_model(model_choice: str) -> tuple[AutoTokenizer, int]:
            - tokenizer (AutoTokenizer): The tokenizer loaded from the specified model.
            - max_token_length (int): The maximum token length set for the tokenizer.
     """
-    # max_token_length = 2048
-    max_token_length = 512 if "electra" in model_choice.lower() else 2048
-    tokenizer = AutoTokenizer.from_pretrained(model_choice, model_max_length=max_token_length)
+    tokenizer = AutoTokenizer.from_pretrained(model_choice)
     
-    return tokenizer, max_token_length
+    return tokenizer
 
 def prepare_and_clean_data(params: dict) -> tuple[str, int]:
     """
