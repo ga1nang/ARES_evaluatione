@@ -55,6 +55,10 @@ def combine_query_document(query: str, document: str, answer: str = None) -> str
     cleaned_document = cleaned_document.replace("=", " ").replace("-", " ")
     cleaned_document = re.sub(r'\s+', ' ', cleaned_document).strip()
     cleaned_document = " ".join(cleaned_document.split(" ")[:512])
+    
+    # Add the heading into the query and document to augment the data
+    query = "# Query\n" + query
+    cleaned_document = "# Document\n" + cleaned_document
 
     # Combine query and cleaned document, optionally including the answer
     if answer is None:
