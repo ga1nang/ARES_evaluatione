@@ -147,7 +147,6 @@ class CustomBERTModel(nn.Module):
         if model_choice in ["mosaicml/mpt-7b-instruct", "mosaicml/mpt-7b"]:
             config = AutoConfig.from_pretrained(model_choice, trust_remote_code=True)
             config.attn_config['attn_impl'] = 'triton'  # Use triton-based FlashAttention
-            config.max_seq_len = max_token_length
 
             model_encoding = AutoModelForCausalLM.from_pretrained(
                 model_choice,
@@ -158,14 +157,6 @@ class CustomBERTModel(nn.Module):
             )
             embedding_size = 4096
             self.encoderModel = model_encoding.transformer
-
-        elif model_choice in ['mosaicml/mpt-1b-redpajama-200b']:
-            model_encoding = MptForSequenceClassification.from_pretrained(
-                "mosaicml/mpt-1b-redpajama-200b", 
-                trust_remote_code=True
-            )
-            embedding_size = 2048
-            self.encoderModel = model_encoding
 
         elif model_choice in ["google/t5-large-lm-adapt", "google/t5-xl-lm-adapt"]:
             model_encoding = AutoModelForSequenceClassification.from_pretrained(model_choice)
