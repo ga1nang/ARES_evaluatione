@@ -481,84 +481,118 @@ def analyze_and_report_data(dataset: str, label_column: str, tokenizer: AutoToke
 
     return synth_queries
 
-def transform_data(synth_queries: pd.DataFrame, validation_set: str, label_column: str) -> tuple[pd.DataFrame, pd.DataFrame]:
+# def transform_data(synth_queries: pd.DataFrame, validation_set: str, label_column: str) -> tuple[pd.DataFrame, pd.DataFrame]:
+#     """
+#     Transforms the synthetic queries and validation set for training and testing.
+
+#     Parameters:
+#     - synth_queries (pd.DataFrame): DataFrame containing synthetic queries.
+#     - validation_set (str): Path to the validation set file.
+#     - label_column (str): The column name used for labeling.
+
+#     Returns:
+#     - tuple: A tuple containing the transformed training and test DataFrames.
+#     """
+#     # Initialize the training DataFrame
+#     train_df = synth_queries
+
+#     # Read and preprocess the validation set
+#     test_set = pd.read_csv(validation_set, sep="\t")
+#     test_set['Question'] = test_set['Query']
+#     test_set['Document'] = test_set['Document'].str.strip()
+#     test_set = test_set[test_set["Document"].str.len() > 100]
+#     test_set = test_set[test_set[label_column].notna()]
+
+#     # Preprocess the training DataFrame
+#     train_df['document'] = train_df['document'].astype(str).str.strip()
+#     train_df = train_df[train_df["document"].str.len() > 100]
+#     train_df = train_df[train_df[label_column].notna()]
+
+#     # Print counts of Answer_Relevance_Label before any further filtering
+#     print(f"Answer_Relevance_Label counts before filtering: Yes - {train_df[train_df['Answer_Relevance_Label'] == 'Yes'].shape[0]}, No - {train_df[train_df['Answer_Relevance_Label'] == 'No'].shape[0]}")
+
+#     # Combine query and document (and generated answer if applicable) into a single text field
+#     if "Context" in label_column:
+#         test_set['concat_text'] = [
+#             combine_query_document(test_set.iloc[i]['Question'], test_set.iloc[i]['Document'])
+#             for i in range(len(test_set))
+#         ]
+
+#         # Print the count before filtering duplicates
+#         print(f"Count before filtering duplicates for context relevance: {len(train_df)}")
+
+#         # Temporarily remove rows with duplicate query/document pairs for context relevance
+#         train_df = train_df.drop_duplicates(subset=["synthetic_query", "document"])
+
+#         # Print the count after filtering
+#         print(f"Count after filtering duplicates for context relevance: {len(train_df)}")
+
+#     else:
+#         test_set['concat_text'] = [
+#             combine_query_document(test_set.iloc[i]['Question'], test_set.iloc[i]['Document'], test_set.iloc[i]['Answer'])
+#             for i in range(len(test_set))
+#         ]
+
+#         # Print the count before filtering
+#         print(f"Count before filtering for context relevance: {len(train_df)}")
+
+#         # Temporarily remove rows where context relevance is 0 for answer relevance/faithfulness
+#         train_df = train_df[train_df["Context_Relevance_Label"] != "No"]
+
+#         # Print the count after filtering
+#         print(f"Count after filtering for context relevance: {len(train_df)}")
+
+#     # Print counts of Answer_Relevance_Label after filtering for context relevance
+#     print(f"Answer_Relevance_Label counts after filtering: Yes - {train_df[train_df['Answer_Relevance_Label'] == 'Yes'].shape[0]}, No - {train_df[train_df['Answer_Relevance_Label'] == 'No'].shape[0]}")
+
+#     # Remove duplicate rows based on the concatenated text
+#     train_df = train_df.drop_duplicates(["concat_text"])
+#     test_set = test_set.drop_duplicates(["concat_text"])
+
+#     # Additional filtering for Answer_Faithfulness classification
+#     if "Faith" in label_column:
+#         print("Refining data for Answer_Faithfulness classification!")
+#         train_df = train_df[train_df["Context_Relevance_Label"].notna()]
+#         train_df = train_df[train_df["Answer_Faithfulness_Label"].notna()]
+#         error_strings = ['answer', 'contrad', 'false', 'information', 'unanswer', 'Answer', 'Contrad', 'False', 'Information', 'Unanswer']
+#         train_df['generated_answer'] = train_df['generated_answer'].astype(str)
+#         train_df = train_df[~train_df['generated_answer'].str.contains('|'.join(error_strings))]
+
+#     return train_df, test_set
+
+def transform_data(training_set: str, validation_set: str, label_column: str) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Transforms the synthetic queries and validation set for training and testing.
 
     Parameters:
-    - synth_queries (pd.DataFrame): DataFrame containing synthetic queries.
+    - training_set (str): Path to the training set file.
     - validation_set (str): Path to the validation set file.
     - label_column (str): The column name used for labeling.
 
     Returns:
     - tuple: A tuple containing the transformed training and test DataFrames.
     """
-    # Initialize the training DataFrame
-    train_df = synth_queries
-
-    # Read and preprocess the validation set
+    train_df = pd.read_csv(training_set, sep="\t")
     test_set = pd.read_csv(validation_set, sep="\t")
-    test_set['Question'] = test_set['Query']
-    test_set['Document'] = test_set['Document'].str.strip()
-    test_set = test_set[test_set["Document"].str.len() > 100]
-    test_set = test_set[test_set[label_column].notna()]
-
-    # Preprocess the training DataFrame
-    train_df['document'] = train_df['document'].astype(str).str.strip()
-    train_df = train_df[train_df["document"].str.len() > 100]
-    train_df = train_df[train_df[label_column].notna()]
-
-    # Print counts of Answer_Relevance_Label before any further filtering
-    print(f"Answer_Relevance_Label counts before filtering: Yes - {train_df[train_df['Answer_Relevance_Label'] == 'Yes'].shape[0]}, No - {train_df[train_df['Answer_Relevance_Label'] == 'No'].shape[0]}")
-
+    
     # Combine query and document (and generated answer if applicable) into a single text field
-    if "Context" in label_column:
+    if "Context_Relevance_Label" in label_column:
+        train_df['concat_text'] = [
+        combine_query_document(train_df.iloc[i]['synthetic_query'], train_df.iloc[i]['document'])
+        for i in range(len(train_df))
+        ]
+        
         test_set['concat_text'] = [
-            combine_query_document(test_set.iloc[i]['Question'], test_set.iloc[i]['Document'])
+            combine_query_document(test_set.iloc[i]['synthetic_query'], test_set.iloc[i]['document'])
             for i in range(len(test_set))
         ]
-
-        # Print the count before filtering duplicates
-        print(f"Count before filtering duplicates for context relevance: {len(train_df)}")
-
-        # Temporarily remove rows with duplicate query/document pairs for context relevance
-        train_df = train_df.drop_duplicates(subset=["synthetic_query", "document"])
-
-        # Print the count after filtering
-        print(f"Count after filtering duplicates for context relevance: {len(train_df)}")
-
-    else:
-        test_set['concat_text'] = [
-            combine_query_document(test_set.iloc[i]['Question'], test_set.iloc[i]['Document'], test_set.iloc[i]['Answer'])
-            for i in range(len(test_set))
-        ]
-
-        # Print the count before filtering
-        print(f"Count before filtering for context relevance: {len(train_df)}")
-
-        # Temporarily remove rows where context relevance is 0 for answer relevance/faithfulness
-        train_df = train_df[train_df["Context_Relevance_Label"] != "No"]
-
-        # Print the count after filtering
-        print(f"Count after filtering for context relevance: {len(train_df)}")
-
-    # Print counts of Answer_Relevance_Label after filtering for context relevance
-    print(f"Answer_Relevance_Label counts after filtering: Yes - {train_df[train_df['Answer_Relevance_Label'] == 'Yes'].shape[0]}, No - {train_df[train_df['Answer_Relevance_Label'] == 'No'].shape[0]}")
 
     # Remove duplicate rows based on the concatenated text
     train_df = train_df.drop_duplicates(["concat_text"])
     test_set = test_set.drop_duplicates(["concat_text"])
-
-    # Additional filtering for Answer_Faithfulness classification
-    if "Faith" in label_column:
-        print("Refining data for Answer_Faithfulness classification!")
-        train_df = train_df[train_df["Context_Relevance_Label"].notna()]
-        train_df = train_df[train_df["Answer_Faithfulness_Label"].notna()]
-        error_strings = ['answer', 'contrad', 'false', 'information', 'unanswer', 'Answer', 'Contrad', 'False', 'Information', 'Unanswer']
-        train_df['generated_answer'] = train_df['generated_answer'].astype(str)
-        train_df = train_df[~train_df['generated_answer'].str.contains('|'.join(error_strings))]
-
+    
     return train_df, test_set
+
 def split_dataset(train_df: pd.DataFrame, dataset: str, 
 test_set: pd.DataFrame, label_column: str) -> tuple[list[str], list[int], list[str], list[int], list[str], list[int], list[int]]:
     """
