@@ -67,7 +67,6 @@ class ARES:
             "training_dataset_path": (str, "None"),  # Optional with default
             "validation_dataset_path": (str, "None"),  # Optional with default
             "model_choice": (str, "microsoft/deberta-v3-large"),  # Optional with default
-            "validation_set_scoring": (bool, True),  # Optional with default
             "assigned_batch_size": (int, REQUIRED_BUT_HAS_DEFAULT, 1),  # Default is 1
             "gradient_accumulation_multiplier": (int, REQUIRED_BUT_HAS_DEFAULT, 32),  # Default is 32
             "number_of_runs": (int, 1),  # Optional with default
