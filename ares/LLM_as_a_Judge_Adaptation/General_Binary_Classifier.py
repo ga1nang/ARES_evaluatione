@@ -565,8 +565,8 @@ def transform_data(training_set: str, validation_set: str, label_column: str) ->
     Returns:
     - tuple: A tuple containing the transformed training and test DataFrames.
     """
-    train_df = pd.read_csv(training_set, sep="\t")
-    test_set = pd.read_csv(validation_set, sep="\t")
+    train_df = pd.read_csv(training_set[0], sep="\t")
+    test_set = pd.read_csv(validation_set[0], sep="\t")
     
     # Combine query and document (and generated answer if applicable) into a single text field
     if "Context_Relevance_Label" in label_column:
@@ -623,7 +623,7 @@ def split_dataset(train_df: pd.DataFrame, test_set: pd.DataFrame, label_column: 
     # Extract concatenated text fields and labels for the test set
     test_set_text = [test_set.iloc[i]['concat_text'] for i in range(len(test_set))]
     if test_set.iloc[0][label_column] in ["Yes", "No"]:
-        test_set_label = [conversion_dict[test_set_label[i][label_column]] for i in range(len(test_set))]
+        test_set_label = [conversion_dict[test_set.iloc[i][label_column]] for i in range(len(test_set))]
     else:
         test_set_label = [int(test_set.iloc[i][label_column]) for i in range(len(test_set))]
 

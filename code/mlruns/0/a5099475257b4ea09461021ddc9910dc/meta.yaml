@@ -1,0 +1,15 @@
+artifact_uri: file:///media/pc1/Ubuntu/Extend_Data/em_Thanh/Evaluation/ARES_evaluatione/code/mlruns/0/a5099475257b4ea09461021ddc9910dc/artifacts
+end_time: null
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: a5099475257b4ea09461021ddc9910dc
+run_name: microsoft/deberta-v3-large_2025-06-11_00:48:29
+run_uuid: a5099475257b4ea09461021ddc9910dc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1749577709130
+status: 1
+tags: []
+user_id: pc1

@@ -66,7 +66,7 @@ def binary_classifer_config(
         # Can be removed
         train_df, test_set = transform_data(training_dataset, validation_set, label)
 
-        train_set_text, train_set_label, test_set_text, text_set_label = split_dataset(train_df, training_dataset_path, test_set, label)
+        train_set_text, train_set_label, test_set_text, text_set_label = split_dataset(train_df, test_set, label)
 
         training_dataset_arrow, validation_dataset_arrow, test_dataset_arrow= prepare_dataset(train_set_label, train_set_text, text_set_label, test_set_text)
 
