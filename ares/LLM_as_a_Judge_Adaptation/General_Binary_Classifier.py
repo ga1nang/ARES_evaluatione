@@ -629,7 +629,10 @@ def split_dataset(train_df: pd.DataFrame, test_set: pd.DataFrame, label_column: 
     
     # Extract concatenated text fields and labels for the test set
     test_set_text = [test_set.iloc[i]['concat_text'] for i in range(len(test_set))]
-    test_set_label = [int(test_set.iloc[i][label_column]) for i in range(len(test_set))]
+    if test_set.iloc[0][label_column] in ["Yes", "No"]:
+        test_set_label = [conversion_dict[test_set_label[i][label_column]] for i in range(len(test_set))]
+    else:
+        test_set_label = [int(test_set.iloc[i][label_column]) for i in range(len(test_set))]
 
     # # Create a sorted list of unique labels
     # labels_list = sorted(list(set(train_set_label + dev_set_label + test_set_label)))
