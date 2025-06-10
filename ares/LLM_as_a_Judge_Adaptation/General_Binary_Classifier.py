@@ -56,10 +56,6 @@ def combine_query_document(query: str, document: str, answer: str = None) -> str
     cleaned_document = re.sub(r'\s+', ' ', cleaned_document).strip()
     cleaned_document = " ".join(cleaned_document.split(" ")[:512])
 
-    # Truncate the query if it is too long
-    if len(query.split(" ")) > 100:
-        query = " ".join(query.split(" ")[:30])
-
     # Combine query and cleaned document, optionally including the answer
     if answer is None:
         return query + " | " + cleaned_document
