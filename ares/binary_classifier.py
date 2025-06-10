@@ -67,9 +67,9 @@ def binary_classifer_config(
         # Can be removed
         train_df, test_set = transform_data(training_dataset, validation_set, label)
 
-        train_set_text, train_set_label, dev_set_text, dev_set_label, test_set_text, text_set_label_, labels_list = split_dataset(train_df, training_dataset_path, test_set, label)
+        train_set_text, train_set_label, test_set_text, text_set_label = split_dataset(train_df, training_dataset_path, test_set, label)
 
-        training_dataset_pandas, training_dataset_arrow, validation_dataset_arrow, test_dataset_arrow, test_dataset_pandas = prepare_dataset(validation_set_scoring, train_set_label, train_set_text, dev_set_label, dev_set_text)
+        training_dataset_pandas, training_dataset_arrow, validation_dataset_arrow, test_dataset_arrow, test_dataset_pandas = prepare_dataset(validation_set_scoring, train_set_label, train_set_text, text_set_label, test_set_text)
 
         tokenized_datasets = initalize_dataset_for_tokenization(tokenizer, training_dataset_arrow, validation_dataset_arrow, test_dataset_arrow)
 

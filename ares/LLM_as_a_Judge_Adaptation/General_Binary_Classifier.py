@@ -593,8 +593,7 @@ def transform_data(training_set: str, validation_set: str, label_column: str) ->
     
     return train_df, test_set
 
-def split_dataset(train_df: pd.DataFrame, dataset: str, 
-test_set: pd.DataFrame, label_column: str) -> tuple[list[str], list[int], list[str], list[int], list[str], list[int], list[int]]:
+def split_dataset(train_df: pd.DataFrame, test_set: pd.DataFrame, label_column: str) -> tuple[list[str], list[int], list[str], list[int]]:
     """
     Splits the dataset into training, development, and test sets, and extracts the corresponding labels.
 
@@ -608,11 +607,8 @@ test_set: pd.DataFrame, label_column: str) -> tuple[list[str], list[int], list[s
     - tuple: A tuple containing:
         - train_set_text (list): List of concatenated text fields for the training set.
         - train_set_label (list): List of labels for the training set.
-        - dev_set_text (list): List of concatenated text fields for the development set.
-        - dev_set_label (list): List of labels for the development set.
         - test_set_text (list): List of concatenated text fields for the test set.
         - test_set_label (list): List of labels for the test set.
-        - labels_list (list): Sorted list of unique labels.
     """
     
     # Conversion dictionary for binary classification
@@ -622,24 +618,23 @@ test_set: pd.DataFrame, label_column: str) -> tuple[list[str], list[int], list[s
     train_set_text = [train_df.iloc[i]['concat_text'] for i in range(len(train_df))]
     
     # Extract labels for the training set
-    if "nq_reformatted" not in dataset:
+    if train_df.iloc[0][label_column] in ["Yes", "No"]:
         train_set_label = [conversion_dict[train_df.iloc[i][label_column]] for i in range(len(train_df))]
     else:
         train_set_label = [int(train_df.iloc[i][label_column]) for i in range(len(train_df))]
     
-    # Extract concatenated text fields and labels for the development set
-    dev_set_text = [test_set.iloc[i]['concat_text'] for i in range(len(test_set))]
-    dev_set_label = [int(test_set.iloc[i][label_column]) for i in range(len(test_set))]
+    # # Extract concatenated text fields and labels for the development set
+    # dev_set_text = [test_set.iloc[i]['concat_text'] for i in range(len(test_set))]
+    # dev_set_label = [int(test_set.iloc[i][label_column]) for i in range(len(test_set))]
     
     # Extract concatenated text fields and labels for the test set
     test_set_text = [test_set.iloc[i]['concat_text'] for i in range(len(test_set))]
     test_set_label = [int(test_set.iloc[i][label_column]) for i in range(len(test_set))]
 
-    # Create a sorted list of unique labels
-    labels_list = sorted(list(set(train_set_label + dev_set_label + test_set_label)))
+    # # Create a sorted list of unique labels
+    # labels_list = sorted(list(set(train_set_label + dev_set_label + test_set_label)))
 
-    return train_set_text, train_set_label, dev_set_text, dev_set_label, test_set_text, test_set_label, labels_list
-
+    return train_set_text, train_set_label, test_set_text, test_set_label
 ############################################################
 
 def prepare_dataset(validation_set_scoring: bool, 
