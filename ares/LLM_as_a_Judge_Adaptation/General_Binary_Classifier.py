@@ -8,10 +8,12 @@ import warnings
 import subprocess as sp
 import datetime
 
+import mlflow.pytorch
 import numpy as np
 import pandas as pd
 import pyarrow as pa
 import mlflow
+import mlflow.torch
 
 import torch
 import torch.nn as nn
@@ -351,7 +353,7 @@ def prepare_and_clean_data(params: dict) -> tuple[str, int]:
     
     # Start MLflow run
     if mlflow.active_run() is None:
-        mlflow.start_run()
+        mlflow.start_run(run_name=f"{model_choice}_{current_datetime}")
 
     # Log parameters to MLflow
     mlflow.log_param("dataset", dataset)
@@ -754,12 +756,9 @@ def train_and_evaluate_model(params: dict) -> tuple[list[torch.nn.Module], list[
     gradient_accumulation_multiplier = params["gradient_accumulation_multiplier"]
 
     # Initialize lists to store metrics
-    micro_averages = []
-    macro_averages = []
     inference_times = []
 
     for i in range(number_of_runs):
-        run_start = time.time()
         print("Loading Model")
 
         # Create dataloaders for training, validation, and evaluation
@@ -850,6 +849,8 @@ def train_and_evaluate_model(params: dict) -> tuple[list[torch.nn.Module], list[
             valid_loss = np.average(valid_losses)
             avg_train_losses.append(train_loss)
             avg_valid_losses.append(valid_loss)
+            mlflow.log_metric("train_loss", train_loss, step=epoch)
+            mlflow.log_metric("valid_loss", valid_loss, step=epoch)
 
             # Print epoch summary
             epoch_len = len(str(num_epochs))
@@ -865,6 +866,9 @@ def train_and_evaluate_model(params: dict) -> tuple[list[torch.nn.Module], list[
             if early_stopping.early_stop:
                 print("Early stopping")
                 break
+            
+        mlflow.log_metric("best_valid_loss", min(avg_valid_losses))
+        mlflow.pytorch.log_model(model, artifact_path="model")
 
     return model, avg_train_losses, avg_valid_losses, eval_dataloader, inference_times
 
