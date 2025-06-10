@@ -62,10 +62,10 @@ def binary_classifer_config(
         }
 
         checkpoint_path, patience_value = prepare_and_clean_data(prepare_data_settings)
+        # # Can be removed
+        # synth_queries = analyze_and_report_data(training_dataset_path, label, tokenizer)
         # Can be removed
-        synth_queries = analyze_and_report_data(training_dataset_path, label, tokenizer, max_token_length)
-        # Can be removed
-        train_df, test_set = transform_data(synth_queries, validation_dataset_path, label)
+        train_df, test_set = transform_data(training_dataset, validation_set, label)
 
         train_set_text, train_set_label, dev_set_text, dev_set_label, test_set_text, text_set_label_, labels_list = split_dataset(train_df, training_dataset_path, test_set, label)
 
