@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa
 import mlflow
-import mlflow.torch
+import mlflow.pytorch
 
 import torch
 import torch.nn as nn
