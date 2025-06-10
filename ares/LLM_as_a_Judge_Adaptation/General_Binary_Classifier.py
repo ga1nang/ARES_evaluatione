@@ -640,24 +640,18 @@ def split_dataset(train_df: pd.DataFrame, test_set: pd.DataFrame, label_column: 
     return train_set_text, train_set_label, test_set_text, test_set_label
 ############################################################
 
-def prepare_dataset(validation_set_scoring: bool, 
-                    train_set_label: list[int], 
+def prepare_dataset(train_set_label: list[int], 
                     train_set_text: list[str], 
-                    dev_set_label: list[int], 
-                    dev_set_text: list[str], 
-                    test_set_label: list[int] = None, 
-                    test_set_text: list[str] = None) -> tuple[pd.DataFrame, datasets.Dataset, datasets.Dataset, datasets.Dataset, pd.DataFrame]:
+                    test_set_label: list[int], 
+                    test_set_text: list[str]) -> tuple[pd.DataFrame, datasets.Dataset, datasets.Dataset, datasets.Dataset, pd.DataFrame]:
     """
     Prepares the dataset for training, validation, and testing by converting them into pandas DataFrames and Arrow tables.
 
     Parameters:
-    - validation_set_scoring (bool): Flag to determine if validation set scoring is enabled.
     - train_set_label (list[int]): List of labels for the training set.
     - train_set_text (list[str]): List of text data for the training set.
-    - dev_set_label (list[int]): List of labels for the development set.
-    - dev_set_text (list[str]): List of text data for the development set.
-    - test_set_label (list[int], optional): List of labels for the test set. Required if validation_set_scoring is False.
-    - test_set_text (list[str], optional): List of text data for the test set. Required if validation_set_scoring is False.
+    - test_set_label (list[int]): List of labels for the test set.
+    - test_set_text (list[str]): List of text data for the test set.
 
     Returns:
     - tuple: A tuple containing:
@@ -667,33 +661,20 @@ def prepare_dataset(validation_set_scoring: bool,
         - test_dataset_arrow (datasets.Dataset): Arrow table for the test set.
         - test_dataset_pandas (pd.DataFrame): DataFrame for the test set.
     """
-    
-    if validation_set_scoring:
-        # Prepare training dataset
-        training_dataset_pandas = pd.DataFrame({'label': train_set_label, 'text': train_set_text})
-        training_dataset_arrow = datasets.Dataset(pa.Table.from_pandas(training_dataset_pandas))
+    # Prepare training dataset
+    training_dataset_pandas = pd.DataFrame({'label': train_set_label, 'text': train_set_text})
+    training_dataset_arrow = datasets.Dataset(pa.Table.from_pandas(training_dataset_pandas))
 
-        # Prepare validation dataset
-        validation_dataset_pandas = pd.DataFrame({'label': dev_set_label, 'text': dev_set_text})
-        validation_dataset_arrow = datasets.Dataset(pa.Table.from_pandas(validation_dataset_pandas))
+    # Prepare validation and test dataset
+    validation_dataset_pandas, test_dataset_pandas = train_test_split(
+        pd.DataFrame({'label': test_set_label, 'text': test_set_text}),
+        test_size=0.5,
+        random_state=29
+    )
+    validation_dataset_arrow = datasets.Dataset(pa.Table.from_pandas(validation_dataset_pandas))
+    test_dataset_arrow = datasets.Dataset(pa.Table.from_pandas(test_dataset_pandas))
 
-        # Prepare test dataset
-        test_dataset_pandas = pd.DataFrame({'label': dev_set_label, 'text': dev_set_text})
-        test_dataset_arrow = datasets.Dataset(pa.Table.from_pandas(test_dataset_pandas))
-    else:
-        # Prepare training dataset
-        training_dataset_pandas = pd.DataFrame({'label': train_set_label, 'text': train_set_text})
-        training_dataset_arrow = datasets.Dataset(pa.Table.from_pandas(training_dataset_pandas))
-
-        # Prepare validation dataset
-        validation_dataset_pandas = pd.DataFrame({'label': dev_set_label, 'text': dev_set_text})
-        validation_dataset_arrow = datasets.Dataset(pa.Table.from_pandas(validation_dataset_pandas))
-
-        # Prepare test dataset
-        test_dataset_pandas = pd.DataFrame({'label': test_set_label, 'text': test_set_text})
-        test_dataset_arrow = datasets.Dataset(pa.Table.from_pandas(test_dataset_pandas))
-
-    return training_dataset_pandas, training_dataset_arrow, validation_dataset_arrow, test_dataset_arrow, test_dataset_pandas
+    return training_dataset_arrow, validation_dataset_arrow, test_dataset_arrow
 
 def initalize_dataset_for_tokenization(tokenizer: PreTrainedTokenizer, 
                                       training_dataset_arrow: datasets.Dataset, 

@@ -26,7 +26,6 @@ def binary_classifer_config(
     training_dataset_path: str = "None",
     validation_dataset_path: str = "None",
     model_choice: str = "microsoft/deberta-v3-large",
-    validation_set_scoring: bool = True,
     assigned_batch_size: int = 1,
     gradient_accumulation_multiplier: int = 32,
     number_of_runs: int = 1,
@@ -69,7 +68,7 @@ def binary_classifer_config(
 
         train_set_text, train_set_label, test_set_text, text_set_label = split_dataset(train_df, training_dataset_path, test_set, label)
 
-        training_dataset_pandas, training_dataset_arrow, validation_dataset_arrow, test_dataset_arrow, test_dataset_pandas = prepare_dataset(validation_set_scoring, train_set_label, train_set_text, text_set_label, test_set_text)
+        training_dataset_arrow, validation_dataset_arrow, test_dataset_arrow= prepare_dataset(train_set_label, train_set_text, text_set_label, test_set_text)
 
         tokenized_datasets = initalize_dataset_for_tokenization(tokenizer, training_dataset_arrow, validation_dataset_arrow, test_dataset_arrow)
 
