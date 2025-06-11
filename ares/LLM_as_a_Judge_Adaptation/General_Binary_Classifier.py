@@ -40,7 +40,7 @@ warnings.filterwarnings(
         "uses the byte fallback option which is not implemented in the fast tokenizers."
     )
 )
-def combine_query_document(query: str, document: str, answer: str = None) -> str:
+def combine_query_document(query: str, document: str,  label_column: str, answer: str = None) -> str:
     """
     Combines a query and a document into a single string, optionally including an answer.
 
@@ -59,8 +59,17 @@ def combine_query_document(query: str, document: str, answer: str = None) -> str
     cleaned_document = " ".join(cleaned_document.split(" ")[:512])
     
     # Add the heading into the query and document to augment the data
-    query = "# Query\n" + query
-    cleaned_document = "# Document\n" + cleaned_document
+    if "Context_Relevance_Label" == label_column:
+        query = "# Query:\n" + query
+        cleaned_document = "# Document:\n" + cleaned_document
+    elif "Answer_Relevance_Label" == label_column:
+        query = "# Query:\n" + query
+        cleaned_document = "# Answer:\n" + cleaned_document
+    elif "Answer_Faithfulness_Label" == label_column:
+        query = "# Document:\n" + query
+        cleaned_document = "# Answer:\n" + cleaned_document
+    else:
+        raise Exception("No label is provided or in wrong format")
 
     # Combine query and cleaned document, optionally including the answer
     if answer is None:
@@ -571,14 +580,36 @@ def transform_data(training_set: str, validation_set: str, label_column: str) ->
     # Combine query and document (and generated answer if applicable) into a single text field
     if "Context_Relevance_Label" in label_column:
         train_df['concat_text'] = [
-        combine_query_document(train_df.iloc[i]['synthetic_query'], train_df.iloc[i]['document'])
+        combine_query_document(train_df.iloc[i]['synthetic_query'], train_df.iloc[i]['document'], "Context_Relevance_Label")
         for i in range(len(train_df))
         ]
         
         test_set['concat_text'] = [
-            combine_query_document(test_set.iloc[i]['synthetic_query'], test_set.iloc[i]['document'])
+            combine_query_document(test_set.iloc[i]['synthetic_query'], test_set.iloc[i]['document'], "Context_Relevance_Label")
             for i in range(len(test_set))
         ]
+    elif "Answer_Relevance_Label" in label_column:
+        train_df['concat_text'] = [
+        combine_query_document(train_df.iloc[i]['synthetic_query'], train_df.iloc[i]['generated_answer'], "Answer_Relevance_Label")
+        for i in range(len(train_df))
+        ]
+        
+        test_set['concat_text'] = [
+            combine_query_document(test_set.iloc[i]['synthetic_query'], test_set.iloc[i]['generated_answer'], "Answer_Relevance_Label")
+            for i in range(len(test_set))
+        ]
+    elif "Answer_Faithfulness_Label" in label_column:
+        train_df['concat_text'] = [
+        combine_query_document(train_df.iloc[i]['document'], train_df.iloc[i]['generated_answer'], "Answer_Faithfulness_Label")
+        for i in range(len(train_df))
+        ]
+        
+        test_set['concat_text'] = [
+            combine_query_document(test_set.iloc[i]['document'], test_set.iloc[i]['generated_answer'], "Answer_Faithfulness_Label")
+            for i in range(len(test_set))
+        ]
+    else:
+        raise Exception("No label is provided or in wrong format")
 
     # Remove duplicate rows based on the concatenated text
     train_df = train_df.drop_duplicates(["concat_text"])
