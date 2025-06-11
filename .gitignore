@@ -5,7 +5,8 @@ main.py
 datasets_file/output/synthetic_queries.tsv
 =======
 >>>>>>> 53caa834542653904f7915cc866db5d4031c3ff8
-
+code/checkpoints/
+code/mlruns/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

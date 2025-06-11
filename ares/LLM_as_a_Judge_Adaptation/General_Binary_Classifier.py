@@ -334,7 +334,7 @@ def prepare_and_clean_data(params: dict) -> tuple[str, int]:
     # In long training jobs, a system crash without a checkpoint mean losing everything.
     # 
     # MLflow’s model tracking is great post-training; checkpoints are essential during training.
-    current_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    current_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     parent_dir = "checkpoints/" + model_choice.replace("/", "-")
     os.makedirs(parent_dir, exist_ok=True)
     checkpoint_path = os.path.join(
