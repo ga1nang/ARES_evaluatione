@@ -949,23 +949,27 @@ def print_and_save_model(total_predictions: torch.Tensor, total_references: torc
     print("Accuracy for Test Set: " + str(results['accuracy']))
 
     # Load F1/Precision/Recall metric
-    f1_metric = load_metric("precision_recall_fscore_support", trust_remote_code=True)
+    f1_metric = load_metric("f1", trust_remote_code=True)
+    precision_metric = load_metric("precision", trust_remote_code=True)
+    recall_metric = load_metric("recall", trust_remote_code=True)
 
     # Macro scores
-    macro_results = f1_metric.compute(
-        average='macro', references=total_references, predictions=total_predictions
-    )
-    print(f"Macro Precision: {macro_results['precision'] * 100:.2f}")
-    print(f"Macro Recall:    {macro_results['recall'] * 100:.2f}")
-    print(f"Macro F1:        {macro_results['f1'] * 100:.2f}")
+    macro_f1 = f1_metric.compute(average='macro', predictions=total_predictions, references=total_references)
+    macro_precision = precision_metric.compute(average='macro', predictions=total_predictions, references=total_references)
+    macro_recall = recall_metric.compute(average='macro', predictions=total_predictions, references=total_references)
+
+    print(f"Macro Precision: {macro_precision['precision'] * 100:.2f}")
+    print(f"Macro Recall:    {macro_recall['recall'] * 100:.2f}")
+    print(f"Macro F1:        {macro_f1['f1'] * 100:.2f}")
 
     # Micro scores
-    micro_results = f1_metric.compute(
-        average='micro', references=total_references, predictions=total_predictions
-    )
-    print(f"Micro Precision: {micro_results['precision'] * 100:.2f}")
-    print(f"Micro Recall:    {micro_results['recall'] * 100:.2f}")
-    print(f"Micro F1:        {micro_results['f1'] * 100:.2f}")
+    micro_f1 = f1_metric.compute(average='micro', predictions=total_predictions, references=total_references)
+    micro_precision = precision_metric.compute(average='micro', predictions=total_predictions, references=total_references)
+    micro_recall = recall_metric.compute(average='micro', predictions=total_predictions, references=total_references)
+
+    print(f"Micro Precision: {micro_precision['precision'] * 100:.2f}")
+    print(f"Micro Recall:    {micro_recall['recall'] * 100:.2f}")
+    print(f"Micro F1:        {micro_f1['f1'] * 100:.2f}")
 
     # Compute and print positive/negative reference ratio
     positive_ratio = round(total_references.tolist().count(1) / len(total_references.tolist()), 3)
@@ -973,12 +977,12 @@ def print_and_save_model(total_predictions: torch.Tensor, total_references: torc
 
     # MLflow logging
     mlflow.log_metric("accuracy", results['accuracy'])
-    mlflow.log_metric("Macro Precision", macro_results['precision'] * 100)
-    mlflow.log_metric("Macro Recall", macro_results['recall'] * 100)
-    mlflow.log_metric("Macro F1", macro_results['f1'] * 100)
-    mlflow.log_metric("Micro Precision", micro_results['precision'] * 100)
-    mlflow.log_metric("Micro Recall", micro_results['recall'] * 100)
-    mlflow.log_metric("Micro F1", micro_results['f1'] * 100)
+    mlflow.log_metric("Macro Precision", macro_precision['precision'] * 100)
+    mlflow.log_metric("Macro Recall", macro_recall['recall'] * 100)
+    mlflow.log_metric("Macro F1", macro_f1['f1'] * 100)
+    mlflow.log_metric("Micro Precision", micro_precision['precision'] * 100)
+    mlflow.log_metric("Micro Recall", micro_recall['recall'] * 100)
+    mlflow.log_metric("Micro F1", micro_f1['f1'] * 100)
     mlflow.log_metric("positive_reference_ratio", positive_ratio)
 
     # Print checkpoint save path
