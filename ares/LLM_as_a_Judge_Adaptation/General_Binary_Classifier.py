@@ -948,16 +948,38 @@ def print_and_save_model(total_predictions: torch.Tensor, total_references: torc
     results = metric.compute(references=total_references, predictions=total_predictions)
     print("Accuracy for Test Set: " + str(results['accuracy']))
 
-    # Compute and print F1 scores
-    f_1_metric = load_metric("f1", trust_remote_code=True)
-    macro_f_1_results = f_1_metric.compute(average='macro', references=total_references, predictions=total_predictions)
-    print("Macro F1 for Test Set: " + str(macro_f_1_results['f1'] * 100))
-    micro_f_1_results = f_1_metric.compute(average='micro', references=total_references, predictions=total_predictions)
-    print("Micro F1 for Test Set: " + str(micro_f_1_results['f1'] * 100))
+    # Load F1/Precision/Recall metric
+    f1_metric = load_metric("precision_recall_fscore_support", trust_remote_code=True)
+
+    # Macro scores
+    macro_results = f1_metric.compute(
+        average='macro', references=total_references, predictions=total_predictions
+    )
+    print(f"Macro Precision: {macro_results['precision'] * 100:.2f}")
+    print(f"Macro Recall:    {macro_results['recall'] * 100:.2f}")
+    print(f"Macro F1:        {macro_results['f1'] * 100:.2f}")
+
+    # Micro scores
+    micro_results = f1_metric.compute(
+        average='micro', references=total_references, predictions=total_predictions
+    )
+    print(f"Micro Precision: {micro_results['precision'] * 100:.2f}")
+    print(f"Micro Recall:    {micro_results['recall'] * 100:.2f}")
+    print(f"Micro F1:        {micro_results['f1'] * 100:.2f}")
 
     # Compute and print positive/negative reference ratio
     positive_ratio = round(total_references.tolist().count(1) / len(total_references.tolist()), 3)
     print("Positive / Negative Reference Ratio: " + str(positive_ratio))
+
+    # MLflow logging
+    mlflow.log_metric("accuracy", results['accuracy'])
+    mlflow.log_metric("Macro Precision", macro_results['precision'] * 100)
+    mlflow.log_metric("Macro Recall", macro_results['recall'] * 100)
+    mlflow.log_metric("Macro F1", macro_results['f1'] * 100)
+    mlflow.log_metric("Micro Precision", micro_results['precision'] * 100)
+    mlflow.log_metric("Micro Recall", micro_results['recall'] * 100)
+    mlflow.log_metric("Micro F1", micro_results['f1'] * 100)
+    mlflow.log_metric("positive_reference_ratio", positive_ratio)
 
     # Print checkpoint save path
     print("Saved classification checkpoint to: " + str(checkpoint_path))
