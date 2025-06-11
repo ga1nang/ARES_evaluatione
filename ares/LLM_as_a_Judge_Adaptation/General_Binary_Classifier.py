@@ -334,7 +334,7 @@ def prepare_and_clean_data(params: dict) -> tuple[str, int]:
     # In long training jobs, a system crash without a checkpoint mean losing everything.
     # 
     # MLflow’s model tracking is great post-training; checkpoints are essential during training.
-    current_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    current_datetime = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     parent_dir = "checkpoints/" + model_choice.replace("/", "-")
     os.makedirs(parent_dir, exist_ok=True)
     checkpoint_path = os.path.join(
@@ -565,8 +565,8 @@ def transform_data(training_set: str, validation_set: str, label_column: str) ->
     Returns:
     - tuple: A tuple containing the transformed training and test DataFrames.
     """
-    train_df = pd.read_csv(training_set, sep="\t")
-    test_set = pd.read_csv(validation_set, sep="\t")
+    train_df = pd.read_csv(training_set[0], sep="\t")
+    test_set = pd.read_csv(validation_set[0], sep="\t")
     
     # Combine query and document (and generated answer if applicable) into a single text field
     if "Context_Relevance_Label" in label_column:
@@ -623,7 +623,7 @@ def split_dataset(train_df: pd.DataFrame, test_set: pd.DataFrame, label_column: 
     # Extract concatenated text fields and labels for the test set
     test_set_text = [test_set.iloc[i]['concat_text'] for i in range(len(test_set))]
     if test_set.iloc[0][label_column] in ["Yes", "No"]:
-        test_set_label = [conversion_dict[test_set_label[i][label_column]] for i in range(len(test_set))]
+        test_set_label = [conversion_dict[test_set.iloc[i][label_column]] for i in range(len(test_set))]
     else:
         test_set_label = [int(test_set.iloc[i][label_column]) for i in range(len(test_set))]
 
@@ -948,16 +948,42 @@ def print_and_save_model(total_predictions: torch.Tensor, total_references: torc
     results = metric.compute(references=total_references, predictions=total_predictions)
     print("Accuracy for Test Set: " + str(results['accuracy']))
 
-    # Compute and print F1 scores
-    f_1_metric = load_metric("f1", trust_remote_code=True)
-    macro_f_1_results = f_1_metric.compute(average='macro', references=total_references, predictions=total_predictions)
-    print("Macro F1 for Test Set: " + str(macro_f_1_results['f1'] * 100))
-    micro_f_1_results = f_1_metric.compute(average='micro', references=total_references, predictions=total_predictions)
-    print("Micro F1 for Test Set: " + str(micro_f_1_results['f1'] * 100))
+    # Load F1/Precision/Recall metric
+    f1_metric = load_metric("f1", trust_remote_code=True)
+    precision_metric = load_metric("precision", trust_remote_code=True)
+    recall_metric = load_metric("recall", trust_remote_code=True)
+
+    # Macro scores
+    macro_f1 = f1_metric.compute(average='macro', predictions=total_predictions, references=total_references)
+    macro_precision = precision_metric.compute(average='macro', predictions=total_predictions, references=total_references)
+    macro_recall = recall_metric.compute(average='macro', predictions=total_predictions, references=total_references)
+
+    print(f"Macro Precision: {macro_precision['precision'] * 100:.2f}")
+    print(f"Macro Recall:    {macro_recall['recall'] * 100:.2f}")
+    print(f"Macro F1:        {macro_f1['f1'] * 100:.2f}")
+
+    # Micro scores
+    micro_f1 = f1_metric.compute(average='micro', predictions=total_predictions, references=total_references)
+    micro_precision = precision_metric.compute(average='micro', predictions=total_predictions, references=total_references)
+    micro_recall = recall_metric.compute(average='micro', predictions=total_predictions, references=total_references)
+
+    print(f"Micro Precision: {micro_precision['precision'] * 100:.2f}")
+    print(f"Micro Recall:    {micro_recall['recall'] * 100:.2f}")
+    print(f"Micro F1:        {micro_f1['f1'] * 100:.2f}")
 
     # Compute and print positive/negative reference ratio
     positive_ratio = round(total_references.tolist().count(1) / len(total_references.tolist()), 3)
     print("Positive / Negative Reference Ratio: " + str(positive_ratio))
+
+    # MLflow logging
+    mlflow.log_metric("accuracy", results['accuracy'])
+    mlflow.log_metric("Macro Precision", macro_precision['precision'] * 100)
+    mlflow.log_metric("Macro Recall", macro_recall['recall'] * 100)
+    mlflow.log_metric("Macro F1", macro_f1['f1'] * 100)
+    mlflow.log_metric("Micro Precision", micro_precision['precision'] * 100)
+    mlflow.log_metric("Micro Recall", micro_recall['recall'] * 100)
+    mlflow.log_metric("Micro F1", micro_f1['f1'] * 100)
+    mlflow.log_metric("positive_reference_ratio", positive_ratio)
 
     # Print checkpoint save path
     print("Saved classification checkpoint to: " + str(checkpoint_path))
