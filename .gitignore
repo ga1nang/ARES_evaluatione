@@ -8,6 +8,7 @@ datasets_file/output/synthetic_queries.tsv
 code/checkpoints/
 code/mlruns/
 code/mlruns
+mlruns/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
